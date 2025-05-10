@@ -1,0 +1,1166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Promotions en cours - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white p-4 transition-colors duration-300">
+  <!-- Hero Section -->
+  <div class="relative overflow-hidden rounded-2xl shadow-xl mb-8">
+    <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-purple-600 opacity-90"></div>
+    <div class="relative max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+          Découvrez les meilleures promotions près de chez vous
+        </h1>
+        <p class="mt-3 max-w-md mx-auto text-base text-orange-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+          Économisez sur vos achats avec les réductions exclusives de nos partenaires
+        </p>
+        <div class="mt-6 flex justify-center gap-4">
+          <button onclick="scrollToPromotions()" class="px-6 py-3 bg-white text-orange-600 font-medium rounded-full hover:bg-gray-100 transition-colors">
+            Voir les promotions
+          </button>
+          <button onclick="showNewsletterModal()" class="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-full hover:bg-white hover:bg-opacity-10 transition-colors">
+            S'abonner aux alertes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow text-center">
+      <div class="text-2xl font-bold text-orange-500">{{ produits_actifs.count }}</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300">Promotions actives</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow text-center">
+      <div class="text-2xl font-bold text-purple-500">{{ categories.count }}</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300">Catégories</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow text-center">
+      <div class="text-2xl font-bold text-blue-500">{{ entreprises_count }}</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300">Entreprises</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow text-center">
+      <div class="text-2xl font-bold text-green-500">{{ users_count }}+</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300">Utilisateurs satisfaits</div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div id="promotions" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 md:p-6 mb-8">
+    <!-- Search Bar -->
+    <div class="relative mb-6">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-full bg-gray-100 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Rechercher des produits, entreprises...">
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600">
+        Filtres des promotions
+      </h2>
+      
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <!-- Zone Filter with datalist -->
+        <div class="relative flex-1 md:w-48">
+          <input list="zone-options" id="zone-filter" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg" placeholder="Localisation">
+          <datalist id="zone-options">
+            <option value="Lomé">
+            <option value="Adidogomé">
+            <option value="Bè">
+            <option value="Baguida">
+            <option value="Tokoin">
+            <option value="Agoè">
+            <option value="Nyékonakpoè">
+            <option value="Légbassito">
+          </datalist>
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="relative flex-1 md:w-48">
+          <select id="category-filter" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+            <option value="">Toutes catégories</option>
+            {% for categorie in categories %}
+            <option value="{{ categorie.nom|lower }}">{{ categorie.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <!-- View Toggle Button -->
+        <button id="toggle-view-btn" class="hidden md:flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg shadow transition-all hover:shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Vue Tableau
+        </button>
+      </div>
+    </div>
+    
+    <!-- Price and Discount Filters -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fourchette de prix (FCFA)</label>
+        <div class="flex items-center space-x-2">
+          <input type="number" id="min-price" placeholder="Min" class="w-1/2 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <span class="text-gray-500">à</span>
+          <input type="number" id="max-price" placeholder="Max" class="w-1/2 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+        </div>
+        <div class="mt-2">
+          <input type="range" id="price-range" min="0" max="100000" step="1000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>0</span>
+            <span>25k</span>
+            <span>50k</span>
+            <span>75k</span>
+            <span>100k+</span>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Réduction minimale</label>
+        <select id="discount-filter" class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <option value="0">Toutes réductions</option>
+          <option value="10">10% et plus</option>
+          <option value="20">20% et plus</option>
+          <option value="30">30% et plus</option>
+          <option value="50">50% et plus</option>
+          <option value="70">70% et plus</option>
+        </select>
+        <div class="mt-2">
+          <input type="range" id="discount-range" min="0" max="90" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>0%</span>
+            <span>30%</span>
+            <span>60%</span>
+            <span>90%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Expiry Date Filter -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date d'expiration</label>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="filterByExpiry('today')" class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full">
+          Aujourd'hui
+        </button>
+        <button onclick="filterByExpiry('week')" class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full">
+          Cette semaine
+        </button>
+        <button onclick="filterByExpiry('month')" class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full">
+          Ce mois
+        </button>
+        <button onclick="filterByExpiry('all')" class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full">
+          Toutes
+        </button>
+      </div>
+    </div>
+    
+    <!-- Active Filters Display -->
+    <div id="active-filters" class="flex flex-wrap gap-2 mb-4 hidden">
+      <!-- Active filters will be added here dynamically -->
+    </div>
+    
+    <!-- Reset Filters Button -->
+    <div class="flex justify-end">
+      <button onclick="resetFilters()" class="text-sm text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+
+  <!-- Promotions Count and Sort -->
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">
+      <span id="products-count">{{ produits_actifs.count }}</span> promotions disponibles
+    </h3>
+    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+      <span>Trier par :</span>
+      <select id="sort-by" class="ml-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1">
+        <option value="date_desc">Plus récentes</option>
+        <option value="date_asc">Plus anciennes</option>
+        <option value="price_asc">Prix croissant</option>
+        <option value="price_desc">Prix décroissant</option>
+        <option value="discount_desc">Plus grande réduction</option>
+        <option value="popular">Plus populaires</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Card View (default) -->
+  <div id="card-view" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for produit in produits_actifs %}
+    <div class="product-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700"
+         data-zone="{{ produit.entreprise.localisation }}" 
+         data-category="{{ produit.categorie.nom|lower }}"
+         data-price="{{ produit.prix_promotionnel }}"
+         data-discount="{{ produit.discount_percentage }}"
+         data-name="{{ produit.nom|lower }}"
+         data-entreprise="{{ produit.entreprise.nom|lower }}"
+         data-jours-restants="{{ produit.jours_restants }}"
+         data-popularite="{{ produit.vues }}">
+      <div class="relative">
+        <img class="w-full h-48 object-cover" src="{{ produit.image.url }}" alt="{{ produit.nom }}" loading="lazy">
+        <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-1 m-2 rounded-full">
+          -{{ produit.discount_percentage }}%
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+          <h3 class="text-white font-bold text-lg">{{ produit.nom }}</h3>
+          <p class="text-gray-300 text-sm">{{ produit.categorie.nom }}</p>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <span class="text-gray-500 dark:text-gray-400 line-through text-sm">{{ produit.prix }} FCFA</span>
+            <span class="text-red-500 font-bold text-xl ml-2">{{ produit.prix_promotionnel }} FCFA</span>
+          </div>
+          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+            J-{{ produit.jours_restants }}
+          </span>
+        </div>
+        
+        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {{ produit.entreprise.localisation }}
+        </div>
+        
+        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          {{ produit.vues }} vues
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="openEntreprisePopup('{{ produit.entreprise.nom }}', '{{ produit.entreprise.description }}', '{% if produit.entreprise.logo %}{{ produit.entreprise.logo.url }}{% endif %}')" 
+                  class="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-lg text-sm flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Entreprise
+          </button>
+          
+          <button onclick="openContactPopup('{{ produit.entreprise.telephone }}', '{{ produit.entreprise.email }}')" 
+                  class="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 px-2 py-1 rounded-lg text-sm flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            Contacter
+          </button>
+          
+          <button onclick="openProductPopup('{{ produit.nom }}', '{{ produit.description }}', '{{ produit.image.url }}')" 
+                  class="bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 px-2 py-1 rounded-lg text-sm flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Détails
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Empty State for Card View -->
+    <div id="empty-state-cards" class="hidden col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 p-8 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">Aucune promotion trouvée</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Essayez de modifier vos filtres de recherche</p>
+      <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+
+  <!-- Table View (hidden by default) -->
+  <div id="table-view" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Produit</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prix/Promo</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Entreprise</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Localisation</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="products-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {% for produit in produits_actifs %}
+          <tr class="product-row hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" 
+              data-zone="{{ produit.entreprise.localisation }}" 
+              data-category="{{ produit.categorie.nom|lower }}"
+              data-price="{{ produit.prix_promotionnel }}"
+              data-discount="{{ produit.discount_percentage }}"
+              data-name="{{ produit.nom|lower }}"
+              data-entreprise="{{ produit.entreprise.nom|lower }}"
+              data-jours-restants="{{ produit.jours_restants }}"
+              data-popularite="{{ produit.vues }}">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <img class="h-10 w-10 rounded-full object-cover" src="{{ produit.image.url }}" alt="{{ produit.nom }}" loading="lazy">
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900 dark:text-white">{{ produit.nom }}</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">{{ produit.categorie.nom }}</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {{ produit.vues }} vues
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 dark:text-white">
+                <span class="line-through text-gray-500 dark:text-gray-400 mr-2">{{ produit.prix }} FCFA</span>
+                <span class="font-bold text-red-500">{{ produit.prix_promotionnel }} FCFA</span>
+              </div>
+              <div class="text-xs text-green-600">-{{ produit.discount_percentage }}%</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                J-{{ produit.jours_restants }} (jusqu'au {{ produit.date_fin_promo|date:"d/m/Y" }})
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                {% if produit.entreprise.logo %}
+                <img src="{{ produit.entreprise.logo.url }}" alt="{{ produit.entreprise.nom }}" class="h-6 w-6 rounded-full object-cover mr-2">
+                {% endif %}
+                <span class="text-sm text-gray-900 dark:text-white">{{ produit.entreprise.nom }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 dark:text-white flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {{ produit.entreprise.localisation }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex space-x-2">
+                <button onclick="openEntreprisePopup('{{ produit.entreprise.nom }}', '{{ produit.entreprise.description }}', '{% if produit.entreprise.logo %}{{ produit.entreprise.logo.url }}{% endif %}')" 
+                        class="p-2 text-blue-500 hover:text-blue-700 dark:hover:text-blue-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </button>
+                <button onclick="openContactPopup('{{ produit.entreprise.telephone }}', '{{ produit.entreprise.email }}')" 
+                        class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </button>
+                <button onclick="openProductPopup('{{ produit.nom }}', '{{ produit.description }}', '{{ produit.image.url }}')" 
+                        class="p-2 text-purple-500 hover:text-purple-700 dark:hover:text-purple-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden p-8 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">Aucune promotion trouvée</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Essayez de modifier vos filtres de recherche</p>
+      <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-8 flex justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+      {% if produits.has_previous %}
+        <a href="?page={{ produits.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+          <span class="sr-only">Précédent</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      {% endif %}
+      
+      {% for num in produits.paginator.page_range %}
+        {% if produits.number == num %}
+          <a href="#" aria-current="page" class="z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-700 text-blue-600 dark:text-blue-300 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+            {{ num }}
+          </a>
+        {% else %}
+          <a href="?page={{ num }}" class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+            {{ num }}
+          </a>
+        {% endif %}
+      {% endfor %}
+      
+      {% if produits.has_next %}
+        <a href="?page={{ produits.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+          <span class="sr-only">Suivant</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      {% endif %}
+    </nav>
+  </div>
+</div>
+
+<!-- Popup Modals -->
+<div id="entreprise-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex items-center">
+        {% if produit.entreprise.logo %}
+        <img id="entreprise-logo" src="" alt="" class="h-10 w-10 rounded-full object-cover mr-3">
+        {% endif %}
+        <h3 id="entreprise-title" class="text-xl font-bold text-gray-900 dark:text-white"></h3>
+      </div>
+      <button onclick="closePopup('entreprise-popup')" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <p id="entreprise-description" class="text-gray-700 dark:text-gray-300 mb-4"></p>
+    <div class="flex justify-end">
+      <button onclick="closePopup('entreprise-popup')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="contact-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Contacter l'entreprise</h3>
+      <button onclick="closePopup('contact-popup')" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="space-y-3">
+      <a id="call-btn" href="#" class="flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+        Appeler
+      </a>
+      <a id="whatsapp-btn" href="#" class="flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        WhatsApp
+      </a>
+      <a id="email-btn" href="#" class="flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Envoyer un email
+      </a>
+    </div>
+    <div class="flex justify-end mt-4">
+      <button onclick="closePopup('contact-popup')" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg transition-colors">
+        Annuler
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="product-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="relative">
+      <img id="product-popup-image" src="" alt="" class="w-full h-48 object-cover rounded-t-lg">
+      <button onclick="closePopup('product-popup')" class="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="p-6">
+      <h3 id="product-popup-title" class="text-xl font-bold text-gray-900 dark:text-white mb-2"></h3>
+      <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span id="product-popup-location"></span>
+      </div>
+      <div class="mb-4">
+        <span class="text-gray-500 dark:text-gray-400 line-through mr-2" id="product-popup-original-price"></span>
+        <span class="text-red-500 font-bold text-xl" id="product-popup-promo-price"></span>
+        <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" id="product-popup-discount"></span>
+      </div>
+      <div class="mb-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span id="product-popup-date"></span>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+        <h4 class="font-medium text-gray-900 dark:text-white mb-2">Description</h4>
+        <p id="product-popup-description" class="text-gray-700 dark:text-gray-300"></p>
+      </div>
+    </div>
+    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-b-lg flex justify-end">
+      <button onclick="closePopup('product-popup')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Newsletter Modal -->
+<div id="newsletter-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Recevez les meilleures promotions</h3>
+      <button onclick="closePopup('newsletter-modal')" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <p class="text-gray-700 dark:text-gray-300 mb-4">Abonnez-vous à notre newsletter pour recevoir les meilleures promotions directement dans votre boîte email.</p>
+    <form id="newsletter-form" class="space-y-4">
+      <div>
+        <label for="newsletter-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+        <input type="email" id="newsletter-email" required class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+      </div>
+      <div>
+        <label for="newsletter-frequency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fréquence</label>
+        <select id="newsletter-frequency" class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <option value="daily">Quotidienne</option>
+          <option value="weekly" selected>Hebdomadaire</option>
+          <option value="monthly">Mensuelle</option>
+        </select>
+      </div>
+      <div class="flex items-center">
+        <input type="checkbox" id="newsletter-terms" required class="mr-2">
+        <label for="newsletter-terms" class="text-sm text-gray-700 dark:text-gray-300">J'accepte les conditions d'utilisation</label>
+      </div>
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="closePopup('newsletter-modal')" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg transition-colors">
+          Annuler
+        </button>
+        <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+          S'abonner
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+    // Toggle between table and card views
+    function toggleViewMode() {
+        const tableView = document.getElementById('table-view');
+        const cardView = document.getElementById('card-view');
+        const toggleBtn = document.getElementById('toggle-view-btn');
+        
+        if (tableView.classList.contains('hidden')) {
+            tableView.classList.remove('hidden');
+            cardView.classList.add('hidden');
+            toggleBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                Vue Cartes
+            `;
+        } else {
+            tableView.classList.add('hidden');
+            cardView.classList.remove('hidden');
+            toggleBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Vue Tableau
+            `;
+        }
+    }
+    
+    // Filter products based on selected filters
+    function filterProducts() {
+        const zoneFilter = document.getElementById('zone-filter').value.toLowerCase();
+        const minPrice = document.getElementById('min-price').value;
+        const maxPrice = document.getElementById('max-price').value;
+        const categoryFilter = document.getElementById('category-filter').value;
+        const discountFilter = document.getElementById('discount-filter').value;
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const sortBy = document.getElementById('sort-by').value;
+        
+        // Get all product rows and cards
+        const rows = document.querySelectorAll('.product-row');
+        const cards = document.querySelectorAll('.product-card');
+        
+        let visibleCount = 0;
+        
+        // Filter rows
+        rows.forEach(row => {
+            const matchesZone = !zoneFilter || row.dataset.zone.toLowerCase().includes(zoneFilter);
+            const matchesCategory = !categoryFilter || row.dataset.category === categoryFilter;
+            const matchesSearch = !searchTerm || 
+                                 row.dataset.name.includes(searchTerm) || 
+                                 row.dataset.entreprise.includes(searchTerm);
+            
+            const price = parseFloat(row.dataset.price);
+            const matchesMinPrice = !minPrice || price >= parseFloat(minPrice);
+            const matchesMaxPrice = !maxPrice || price <= parseFloat(maxPrice);
+            
+            const discount = parseFloat(row.dataset.discount);
+            const matchesDiscount = !discountFilter || discount >= parseFloat(discountFilter);
+            
+            if (matchesZone && matchesCategory && matchesSearch && matchesMinPrice && matchesMaxPrice && matchesDiscount) {
+                row.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+        
+        // Filter cards
+        cards.forEach(card => {
+            const matchesZone = !zoneFilter || card.dataset.zone.toLowerCase().includes(zoneFilter);
+            const matchesCategory = !categoryFilter || card.dataset.category === categoryFilter;
+            const matchesSearch = !searchTerm || 
+                                 card.dataset.name.includes(searchTerm) || 
+                                 card.dataset.entreprise.includes(searchTerm);
+            
+            const price = parseFloat(card.dataset.price);
+            const matchesMinPrice = !minPrice || price >= parseFloat(minPrice);
+            const matchesMaxPrice = !maxPrice || price <= parseFloat(maxPrice);
+            
+            const discount = parseFloat(card.dataset.discount);
+            const matchesDiscount = !discountFilter || discount >= parseFloat(discountFilter);
+            
+            if (matchesZone && matchesCategory && matchesSearch && matchesMinPrice && matchesMaxPrice && matchesDiscount) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+        
+        // Update products count
+        document.getElementById('products-count').textContent = visibleCount;
+        
+        // Show/hide empty state
+        const isEmpty = visibleCount === 0;
+        document.getElementById('empty-state').classList.toggle('hidden', !isEmpty);
+        document.getElementById('empty-state-cards').classList.toggle('hidden', !isEmpty);
+        
+        // Update active filters display
+        updateActiveFiltersDisplay();
+        
+        // Apply sorting after filtering
+        sortProducts();
+    }
+    
+    // Filter by expiry date
+    function filterByExpiry(range) {
+        const rows = document.querySelectorAll('.product-row');
+        const cards = document.querySelectorAll('.product-card');
+        const today = new Date();
+        
+        rows.forEach(row => {
+            const daysLeft = parseInt(row.dataset.joursRestants);
+            let show = true;
+            
+            switch(range) {
+                case 'today':
+                    show = daysLeft === 0;
+                    break;
+                case 'week':
+                    show = daysLeft <= 7;
+                    break;
+                case 'month':
+                    show = daysLeft <= 30;
+                    break;
+                case 'all':
+                    show = true;
+                    break;
+            }
+            
+            if (show) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+        
+        cards.forEach(card => {
+            const daysLeft = parseInt(card.dataset.joursRestants);
+            let show = true;
+            
+            switch(range) {
+                case 'today':
+                    show = daysLeft === 0;
+                    break;
+                case 'week':
+                    show = daysLeft <= 7;
+                    break;
+                case 'month':
+                    show = daysLeft <= 30;
+                    break;
+                case 'all':
+                    show = true;
+                    break;
+            }
+            
+            if (show) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+        
+        // Update count
+        const visibleCount = document.querySelectorAll('.product-row:not(.hidden)').length;
+        document.getElementById('products-count').textContent = visibleCount;
+        
+        // Show/hide empty state
+        const isEmpty = visibleCount === 0;
+        document.getElementById('empty-state').classList.toggle('hidden', !isEmpty);
+        document.getElementById('empty-state-cards').classList.toggle('hidden', !isEmpty);
+        
+        // Add active filter
+        updateActiveFiltersDisplay();
+    }
+    
+    // Update active filters display
+    function updateActiveFiltersDisplay() {
+        const activeFiltersContainer = document.getElementById('active-filters');
+        activeFiltersContainer.innerHTML = '';
+        
+        const zoneFilter = document.getElementById('zone-filter').value;
+        const minPrice = document.getElementById('min-price').value;
+        const maxPrice = document.getElementById('max-price').value;
+        const categoryFilter = document.getElementById('category-filter').value;
+        const discountFilter = document.getElementById('discount-filter').value;
+        const searchTerm = document.getElementById('search-input').value;
+        
+        let hasActiveFilters = false;
+        
+        if (zoneFilter) {
+            addActiveFilter('Localisation: ' + zoneFilter, 'zone');
+            hasActiveFilters = true;
+        }
+        
+        if (categoryFilter) {
+            const categoryText = document.getElementById('category-filter').options[document.getElementById('category-filter').selectedIndex].text;
+            addActiveFilter('Catégorie: ' + categoryText, 'category');
+            hasActiveFilters = true;
+        }
+        
+        if (minPrice || maxPrice) {
+            let priceText = 'Prix: ';
+            if (minPrice && maxPrice) {
+                priceText += `${minPrice} - ${maxPrice} FCFA`;
+            } else if (minPrice) {
+                priceText += `À partir de ${minPrice} FCFA`;
+            } else {
+                priceText += `Jusqu'à ${maxPrice} FCFA`;
+            }
+            addActiveFilter(priceText, 'price');
+            hasActiveFilters = true;
+        }
+        
+        if (discountFilter && discountFilter !== '0') {
+            addActiveFilter('Réduction: ' + discountFilter + '% et plus', 'discount');
+            hasActiveFilters = true;
+        }
+        
+        if (searchTerm) {
+            addActiveFilter('Recherche: "' + searchTerm + '"', 'search');
+            hasActiveFilters = true;
+        }
+        
+        activeFiltersContainer.classList.toggle('hidden', !hasActiveFilters);
+    }
+    
+    // Add an active filter chip
+    function addActiveFilter(text, type) {
+        const chip = document.createElement('div');
+        chip.className = 'flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300';
+        chip.innerHTML = `
+            ${text}
+            <button onclick="removeFilter('${type}')" class="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        document.getElementById('active-filters').appendChild(chip);
+    }
+    
+    // Remove a specific filter
+    function removeFilter(type) {
+        switch(type) {
+            case 'zone':
+                document.getElementById('zone-filter').value = '';
+                break;
+            case 'category':
+                document.getElementById('category-filter').value = '';
+                break;
+            case 'price':
+                document.getElementById('min-price').value = '';
+                document.getElementById('max-price').value = '';
+                document.getElementById('price-range').value = 50000;
+                break;
+            case 'discount':
+                document.getElementById('discount-filter').value = '0';
+                document.getElementById('discount-range').value = 30;
+                break;
+            case 'search':
+                document.getElementById('search-input').value = '';
+                break;
+        }
+        filterProducts();
+    }
+    
+    // Reset all filters
+    function resetFilters() {
+        document.getElementById('zone-filter').value = '';
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        document.getElementById('category-filter').value = '';
+        document.getElementById('discount-filter').value = '0';
+        document.getElementById('search-input').value = '';
+        document.getElementById('sort-by').value = 'date_desc';
+        document.getElementById('price-range').value = 50000;
+        document.getElementById('discount-range').value = 30;
+        filterProducts();
+        sortProducts();
+    }
+    
+    // Sort products
+    function sortProducts() {
+        const sortBy = document.getElementById('sort-by').value;
+        const rows = Array.from(document.querySelectorAll('.product-row:not(.hidden)'));
+        const cards = Array.from(document.querySelectorAll('.product-card:not(.hidden)'));
+        
+        // Get the parent containers
+        const tableBody = document.getElementById('products-table-body');
+        const cardContainer = document.getElementById('card-view');
+        
+        // Determine sort function based on selection
+        let sortFunction;
+        switch(sortBy) {
+            case 'date_asc':
+                sortFunction = (a, b) => parseInt(a.dataset.joursRestants) - parseInt(b.dataset.joursRestants);
+                break;
+            case 'date_desc':
+                sortFunction = (a, b) => parseInt(b.dataset.joursRestants) - parseInt(a.dataset.joursRestants);
+                break;
+            case 'price_asc':
+                sortFunction = (a, b) => parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                break;
+            case 'price_desc':
+                sortFunction = (a, b) => parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                break;
+            case 'discount_desc':
+                sortFunction = (a, b) => parseFloat(b.dataset.discount) - parseFloat(a.dataset.discount);
+                break;
+            case 'popular':
+                sortFunction = (a, b) => parseInt(b.dataset.popularite) - parseInt(a.dataset.popularite);
+                break;
+            default:
+                return;
+        }
+        
+        // Sort rows and re-append to table
+        rows.sort(sortFunction);
+        rows.forEach(row => tableBody.appendChild(row));
+        
+        // Sort cards and re-append to container
+        cards.sort(sortFunction);
+        cards.forEach(card => cardContainer.appendChild(card));
+    }
+    
+    // Popup functions
+    function openEntreprisePopup(nom, description, logoUrl) {
+        document.getElementById('entreprise-title').textContent = nom;
+        document.getElementById('entreprise-description').textContent = description || "Aucune description disponible";
+        
+        const logoElement = document.getElementById('entreprise-logo');
+        if (logoUrl && logoElement) {
+            logoElement.src = logoUrl;
+            logoElement.alt = nom;
+            logoElement.classList.remove('hidden');
+        } else if (logoElement) {
+            logoElement.classList.add('hidden');
+        }
+        
+        document.getElementById('entreprise-popup').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function openContactPopup(telephone, email) {
+        if (telephone) {
+            document.getElementById('call-btn').href = `tel:${telephone}`;
+            document.getElementById('whatsapp-btn').href = `https://wa.me/${telephone}`;
+            document.getElementById('call-btn').classList.remove('opacity-50', 'pointer-events-none');
+            document.getElementById('whatsapp-btn').classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+            document.getElementById('call-btn').classList.add('opacity-50', 'pointer-events-none');
+            document.getElementById('whatsapp-btn').classList.add('opacity-50', 'pointer-events-none');
+        }
+        
+        if (email) {
+            document.getElementById('email-btn').href = `mailto:${email}`;
+            document.getElementById('email-btn').classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+            document.getElementById('email-btn').classList.add('opacity-50', 'pointer-events-none');
+        }
+        
+        document.getElementById('contact-popup').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function openProductPopup(nom, description, imageUrl) {
+        document.getElementById('product-popup-title').textContent = nom;
+        document.getElementById('product-popup-description').textContent = description || "Aucune description disponible";
+        document.getElementById('product-popup-image').src = imageUrl;
+        document.getElementById('product-popup-image').alt = nom;
+        
+        // Find the product card to get additional info
+        const productCard = document.querySelector(`.product-card[data-name="${nom.toLowerCase()}"]`);
+        if (productCard) {
+            document.getElementById('product-popup-location').textContent = productCard.dataset.zone;
+            
+            const originalPrice = productCard.querySelector('.line-through').textContent;
+            const promoPrice = productCard.querySelector('.text-red-500').textContent;
+            const discount = productCard.querySelector('.bg-green-100').textContent;
+            const dateInfo = productCard.querySelector('.bg-green-100').nextElementSibling.textContent;
+            
+            document.getElementById('product-popup-original-price').textContent = originalPrice;
+            document.getElementById('product-popup-promo-price').textContent = promoPrice;
+            document.getElementById('product-popup-discount').textContent = discount;
+            document.getElementById('product-popup-date').textContent = dateInfo;
+        }
+        
+        document.getElementById('product-popup').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function closePopup(id) {
+        document.getElementById(id).classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        
+        // Reset contact buttons
+        document.getElementById('call-btn').classList.remove('opacity-50', 'pointer-events-none');
+        document.getElementById('whatsapp-btn').classList.remove('opacity-50', 'pointer-events-none');
+        document.getElementById('email-btn').classList.remove('opacity-50', 'pointer-events-none');
+    }
+    
+    // Newsletter functions
+    function showNewsletterModal() {
+        document.getElementById('newsletter-modal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function handleNewsletterSubmit(e) {
+        e.preventDefault();
+        const email = document.getElementById('newsletter-email').value;
+        const frequency = document.getElementById('newsletter-frequency').value;
+        
+        // Here you would typically send this data to your backend
+        console.log('Subscribing:', email, frequency);
+        
+        // Show success message
+        alert('Merci pour votre inscription à notre newsletter !');
+        closePopup('newsletter-modal');
+    }
+    
+    // Scroll to promotions section
+    function scrollToPromotions() {
+        document.getElementById('promotions').scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+    
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply filters when any filter changes
+        document.getElementById('zone-filter').addEventListener('input', filterProducts);
+        document.getElementById('category-filter').addEventListener('change', filterProducts);
+        document.getElementById('discount-filter').addEventListener('change', filterProducts);
+        document.getElementById('min-price').addEventListener('input', filterProducts);
+        document.getElementById('max-price').addEventListener('input', filterProducts);
+        document.getElementById('search-input').addEventListener('input', filterProducts);
+        document.getElementById('sort-by').addEventListener('change', sortProducts);
+        
+        // Price range slider
+        document.getElementById('price-range').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            document.getElementById('min-price').value = Math.max(0, value - 10000);
+            document.getElementById('max-price').value = value + 10000;
+            filterProducts();
+        });
+        
+        // Discount range slider
+        document.getElementById('discount-range').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            document.getElementById('discount-filter').value = value;
+            filterProducts();
+        });
+        
+        // Toggle view mode
+        document.getElementById('toggle-view-btn').addEventListener('click', toggleViewMode);
+        
+        // Newsletter form
+        document.getElementById('newsletter-form').addEventListener('submit', handleNewsletterSubmit);
+        
+        // Set card view as default on mobile
+        if (window.innerWidth < 768) {
+            document.getElementById('table-view').classList.add('hidden');
+            document.getElementById('card-view').classList.remove('hidden');
+        }
+        
+        // Initialize filters
+        filterProducts();
+    });
+    
+    // Responsive adjustments on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth < 768) {
+            document.getElementById('table-view').classList.add('hidden');
+            document.getElementById('card-view').classList.remove('hidden');
+        }
+    });
+</script>
+
+<style>
+    /* Animations */
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Popup animations */
+    #entreprise-popup > div,
+    #contact-popup > div,
+    #product-popup > div,
+    #newsletter-modal > div {
+        animation: fade-in 0.3s ease-out;
+    }
+    
+    /* Product cards hover effect */
+    .product-card {
+        transition: all 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        #card-view {
+            grid-template-columns: 1fr;
+        }
+        
+        .flex.justify-between.items-start {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        #toggle-view-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    /* Dark mode transitions */
+    .dark .product-card {
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        @apply bg-gray-100 dark:bg-gray-800;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-500 dark:bg-gray-500;
+    }
+    
+    /* Custom scrollbar for product popup */
+    #product-popup > div {
+        scrollbar-width: thin;
+        scrollbar-color: #9CA3AF #E5E7EB;
+    }
+    
+    .dark #product-popup > div {
+        scrollbar-color: #4B5563 #1F2937;
+    }
+    
+    /* Range slider styling */
+    input[type="range"] {
+        -webkit-appearance: none;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .dark input[type="range"] {
+        background: #4b5563;
+    }
+    
+    .dark input[type="range"]::-webkit-slider-thumb {
+        background: #2563eb;
+    }
+</style>
+{% endblock %}

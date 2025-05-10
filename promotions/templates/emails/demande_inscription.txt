@@ -1,0 +1,11 @@
+Nouvelle demande d'inscription reçue :
+
+Entreprise: {{ company_name }}
+Type: {{ business_type }}
+Email: {{ email }}
+Téléphone: {{ phone }}
+Adresse: {{ full_address }}
+Lien Google Maps: {% if location_link %}{{ location_link }}{% else %}Non fourni{% endif %}
+
+Message additionnel:
+{% if message %}{{ message }}{% else %}Aucun message additionnel{% endif %}

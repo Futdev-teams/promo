@@ -1,0 +1,856 @@
+{% extends 'base.html' %}
+{% block title %}Promotions en cours - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+  <!-- Hero Section with Typing Effect -->
+  <div class="relative overflow-hidden rounded-b-2xl shadow-xl">
+    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-orange-500 opacity-90"></div>
+    <div class="relative max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
+          <span class="typing-text" data-texts='["L&#39;unique plateforme de promotions universelle", "Économisez jusqu&#39;à 80%", "Découvrez des offres exclusives autour de vous"]'></span>
+        </h1>
+        <p class="mt-4 max-w-md mx-auto text-xl text-purple-100">
+          Plus de {{ produit_list.count }} promotions actives en ce moment
+        </p>
+        <div class="mt-8 flex justify-center gap-4">
+          <button onclick="scrollToPromotions()" class="px-6 py-3 bg-white text-purple-600 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
+            Explorer les offres
+          </button>
+          <button onclick="showNewsletterModal()" class="px-6 py-3 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:bg-opacity-10 transition-all transform hover:scale-105">
+            <span class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Recevoir les alertes
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section with Glow Effect -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
+      <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">{{ produit_list.count }}</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Promotions actives</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
+      <div class="text-3xl font-bold bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">{{ categories.count }}</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Catégories</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
+      <div class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">{{ entreprises_count }}</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Entreprises</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
+      <div class="text-3xl font-bold bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">{{ users_count }}+</div>
+      <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Utilisateurs satisfaits</div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div id="promotions" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8 border border-gray-200 dark:border-gray-700">
+      <!-- Search Bar -->
+      <div class="relative mb-6">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-full bg-gray-100 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300" placeholder="Rechercher des produits, entreprises...">
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">
+          Filtres des promotions
+        </h2>
+        
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <!-- Zone Filter -->
+          <div class="relative flex-1 md:w-48">
+            <input list="zone-options" id="zone-filter" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300" placeholder="Localisation">
+            <datalist id="zone-options">
+              {% for zone in zones_uniques %}
+              <option value="{{ zone }}">
+              {% endfor %}
+            </datalist>
+          </div>
+          
+          <!-- Category Filter -->
+          <div class="relative flex-1 md:w-48">
+            <select id="category-filter" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300">
+              <option value="">Toutes catégories</option>
+              {% for categorie in categories %}
+              <option value="{{ categorie.nom }}">{{ categorie.nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Price Range and Sorting -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fourchette de prix (FCFA)</label>
+          <div class="flex items-center space-x-2">
+            <input type="number" id="min-price" placeholder="Min" class="w-1/2 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300">
+            <span class="text-gray-500">à</span>
+            <input type="number" id="max-price" placeholder="Max" class="w-1/2 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300">
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Trier par :</label>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setSortOption('recent')" id="sort-recent" class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full text-sm font-medium transition-all duration-300">
+              Plus récent
+            </button>
+            <button onclick="setSortOption('asc')" id="sort-asc" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium transition-all duration-300">
+              Prix croissant
+            </button>
+            <button onclick="setSortOption('desc')" id="sort-desc" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium transition-all duration-300">
+              Prix décroissant
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Active Filters Display -->
+      <div id="active-filters" class="flex flex-wrap gap-2 mb-4 hidden">
+        <!-- Active filters will be added here dynamically -->
+      </div>
+      
+      <!-- Reset Filters Button -->
+      <div class="flex justify-end">
+        <button onclick="resetFilters()" class="text-sm bg-gradient-to-r from-purple-600 to-orange-500 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all duration-300 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+
+    <!-- Products Count -->
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">
+        <span id="products-count">{{ produit_list.count }}</span> promotions disponibles
+        <span id="filtered-count" class="text-sm text-purple-600 dark:text-purple-400 hidden">(<span id="filtered-number">0</span> correspondant à vos filtres)</span>
+      </h3>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-container">
+      {% for produit in produit_list %}
+      <div class="product-card bg-white dark:bg-gray-800 rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl relative group"
+           data-price="{{ produit.prix_promotionnel }}"
+           data-zone="{{ produit.entreprise.localisation }}"
+           data-categorie="{{ produit.categorie.nom }}"
+           data-date="{{ produit.date_debut_promo|date:'U' }}"
+           data-name="{{ produit.nom|lower }}"
+           data-entreprise="{{ produit.entreprise.nom|lower }}"
+           data-discount="{{ produit.discount_percentage }}"
+           data-telephone="{{ produit.entreprise.contact }}"
+           data-entreprise-id="{{ produit.entreprise.id }}">
+        <!-- Product Image with Name Overlay -->
+        <div class="relative h-48 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
+          <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <h3 class="absolute bottom-4 left-4 right-4 text-xl font-bold text-white truncate z-20">{{ produit.nom }}</h3>
+          <!-- Discount Badge -->
+          <div class="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-20">
+            -{{ produit.discount_percentage }}%
+          </div>
+        </div>
+
+        <!-- Product Content -->
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="{{ produit.entreprise.logo.url }}" alt="{{ produit.entreprise.nom }}" class="w-8 h-8 rounded-full object-cover shadow-md mr-2">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ produit.entreprise.nom }}</span>
+            </div>
+            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {{ produit.entreprise.localisation }}
+            </div>
+          </div>
+
+          <!-- Price Info -->
+          <div class="mt-3">
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-through">{{ produit.prix }} FCFA</p>
+            <p class="text-xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">{{ produit.prix_promotionnel }} FCFA</p>
+          </div>
+
+          <!-- Date Info -->
+          <div class="mt-2 flex justify-between text-xs">
+            <span class="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-2 py-1 rounded">Début: {{ produit.date_debut_promo|date:"d/m/Y" }}</span>
+            <span class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">Fin: {{ produit.date_fin_promo|date:"d/m/Y" }}</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-4 grid grid-cols-2 gap-2">
+            <button onclick="openContactPopup('{{ produit.entreprise.nom }}', '{{ produit.nom }}', '{{ produit.entreprise.contact }}', '{{ produit.entreprise.email }}')" 
+                    class="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-800 transition-all duration-300 group/btn">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-hover/btn:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              Contacter
+            </button>
+            
+            <a href="{% url 'entreprise_public_view' produit.entreprise.id %}" class="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800 transition-all duration-300 group/btn">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-hover/btn:animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              Voir l'entreprise
+            </a>
+          </div>
+        </div>
+
+        <!-- Glow Border Effect -->
+        <div class="absolute inset-0 border-2 border-transparent group-hover:border-purple-500/30 rounded-xl pointer-events-none transition-all duration-500"></div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Empty State -->
+    <div id="no-results" class="hidden text-center py-12">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-4 text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Aucun résultat trouvé</h3>
+      <p class="mt-2 text-gray-500 dark:text-gray-400">Essayez d'ajuster vos filtres de recherche</p>
+      <button onclick="resetFilters()" class="mt-6 px-6 py-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white rounded-lg hover:opacity-90 transition-all duration-300">
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Popup -->
+<div id="contact-popup" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 relative transform transition-all duration-300 scale-95 opacity-0"
+       id="contact-popup-content">
+    <button onclick="closeContactPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Contacter l'entreprise</h2>
+      <div class="w-20 h-1 bg-gradient-to-r from-purple-500 to-orange-500 mx-auto mt-2 rounded-full"></div>
+    </div>
+    
+    <div class="mb-6">
+      <div class="flex items-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+        <span class="font-medium text-gray-700 dark:text-gray-300" id="contact-entreprise"></span>
+      </div>
+      <div class="flex items-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <span class="text-gray-700 dark:text-gray-300" id="contact-produit"></span>
+      </div>
+    </div>
+    
+    <div class="space-y-4">
+      <a id="contact-call" href="#" class="block px-4 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+        </svg>
+        Appeler maintenant
+      </a>
+      
+      <a id="contact-whatsapp" href="#" class="block px-4 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.018c1.276-.36 2.5-1.238 3.239-2.22l-1.003-.604c-.26.15-.584.234-.928.234-1.035 0-1.875-.84-1.875-1.875v-.468c-.477.266-1.03.422-1.625.422-1.929 0-3.5-1.571-3.5-3.5 0-.595.156-1.148.422-1.625h-.468c-1.036 0-1.875.84-1.875 1.875v6.5c0 1.035.84 1.875 1.875 1.875h6.5c1.036 0 1.875-.84 1.875-1.875v-.094l-.031-.031M12 2.5C6.201 2.5 1.5 7.201 1.5 13c0 1.802.48 3.489 1.32 4.941l-1.246 3.73 3.847-1.229A10.456 10.456 0 0012 23.5c5.799 0 10.5-4.701 10.5-10.5S17.799 2.5 12 2.5"/>
+        </svg>
+        Envoyer un message WhatsApp
+      </a>
+      
+      <a id="contact-mail" href="#" class="block px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+        </svg>
+        Envoyer un email
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Newsletter Modal -->
+<div id="newsletter-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 relative transform transition-all duration-300 scale-95 opacity-0"
+       id="newsletter-modal-content">
+    <button onclick="closePopup('newsletter-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    
+    <div class="text-center mb-6">
+      <h3 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Recevez les meilleures promotions</h3>
+      <div class="w-20 h-1 bg-gradient-to-r from-purple-500 to-orange-500 mx-auto mt-2 rounded-full"></div>
+    </div>
+    
+    <p class="text-gray-600 dark:text-gray-400 mb-6 text-center">Abonnez-vous pour ne manquer aucune offre exceptionnelle près de chez vous.</p>
+    
+    <form id="newsletter-form" class="space-y-4" method="POST" action="{% url 'newsletter_subscribe' %}">
+      {% csrf_token %}
+      <div>
+        <label for="newsletter-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Votre email</label>
+        <input type="email" id="newsletter-email" name="email" required class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300">
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fréquence des alertes</label>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="frequency" value="daily" class="form-radio h-4 w-4 text-purple-600 focus:ring-purple-500">
+            <span class="ml-2 text-sm">Quotidien</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="radio" name="frequency" value="weekly" checked class="form-radio h-4 w-4 text-purple-600 focus:ring-purple-500">
+            <span class="ml-2 text-sm">Hebdo</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="radio" name="frequency" value="monthly" class="form-radio h-4 w-4 text-purple-600 focus:ring-purple-500">
+            <span class="ml-2 text-sm">Mensuel</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="flex items-start">
+        <input type="checkbox" id="newsletter-terms" name="terms" required class="mt-1 form-checkbox h-4 w-4 text-purple-600 focus:ring-purple-500">
+        <label for="newsletter-terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+          J'accepte de recevoir des offres promotionnelles et je confirme avoir lu la 
+          <a href="#" class="text-purple-600 hover:text-purple-500">politique de confidentialité</a>
+        </label>
+      </div>
+      
+      <div class="pt-4">
+        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-300 font-medium shadow-md">
+          S'abonner maintenant
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Success Notification -->
+<div id="success-notification" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300">
+  <div class="flex items-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="notification-message">Action réussie !</span>
+  </div>
+</div>
+
+<script>
+    // Typing Effect for Hero Section
+    class TypingEffect {
+        constructor(element, texts, options = {}) {
+            this.element = element;
+            this.texts = texts;
+            this.speed = options.speed || 100;
+            this.delay = options.delay || 2000;
+            this.loop = options.loop !== false;
+            this.currentText = '';
+            this.currentIndex = 0;
+            this.isDeleting = false;
+            this.timeout = null;
+            this.init();
+        }
+        
+        init() {
+            this.type();
+        }
+        
+        type() {
+            const fullText = this.texts[this.currentIndex];
+            
+            if (this.isDeleting) {
+                this.currentText = fullText.substring(0, this.currentText.length - 1);
+            } else {
+                this.currentText = fullText.substring(0, this.currentText.length + 1);
+            }
+            
+            this.element.textContent = this.currentText;
+            
+            let typeSpeed = this.speed;
+            
+            if (this.isDeleting) {
+                typeSpeed /= 2;
+            }
+            
+            if (!this.isDeleting && this.currentText === fullText) {
+                typeSpeed = this.delay;
+                this.isDeleting = true;
+            } else if (this.isDeleting && this.currentText === '') {
+                this.isDeleting = false;
+                this.currentIndex++;
+                
+                if (!this.loop && this.currentIndex === this.texts.length) {
+                    return;
+                } else if (this.currentIndex === this.texts.length) {
+                    this.currentIndex = 0;
+                }
+                
+                typeSpeed = 500;
+            }
+            
+            this.timeout = setTimeout(() => this.type(), typeSpeed);
+        }
+        
+        destroy() {
+            clearTimeout(this.timeout);
+        }
+    }
+    
+    // Initialize typing effect
+    document.addEventListener('DOMContentLoaded', function() {
+        const typingElements = document.querySelectorAll('.typing-text');
+        typingElements.forEach(el => {
+            const texts = JSON.parse(el.getAttribute('data-texts'));
+            new TypingEffect(el, texts, {
+                speed: 100,
+                delay: 2000,
+                loop: true
+            });
+        });
+    });
+
+    // Fonction pour ouvrir le pop-up de contact
+    function openContactPopup(entreprise, produit, telephone, email) {
+        document.getElementById('contact-entreprise').textContent = entreprise;
+        document.getElementById('contact-produit').textContent = produit;
+        
+        // Format telephone number for WhatsApp
+        const formattedTel = telephone.replace(/\D/g, '');
+        const whatsappUrl = `https://wa.me/${formattedTel}?text=Bonjour ${encodeURIComponent(entreprise)}, je suis intéressé par votre promotion sur ${encodeURIComponent(produit)}. Pourriez-vous m'en dire plus ?`;
+        
+        // Set contact links
+        document.getElementById('contact-call').href = `tel:${telephone}`;
+        document.getElementById('contact-whatsapp').href = whatsappUrl;
+        document.getElementById('contact-mail').href = `mailto:${email}?subject=Demande d'information sur ${produit}`;
+        
+        // Show popup with animation
+        const popup = document.getElementById('contact-popup');
+        const content = document.getElementById('contact-popup-content');
+        popup.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+        document.body.classList.add('overflow-hidden');
+    }
+
+    // Fonction pour fermer le pop-up de contact
+    function closeContactPopup() {
+        const content = document.getElementById('contact-popup-content');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            document.getElementById('contact-popup').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+
+    // Set sort option
+    function setSortOption(option) {
+        // Update button styles
+        document.getElementById('sort-recent').classList.remove('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+        document.getElementById('sort-asc').classList.remove('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+        document.getElementById('sort-desc').classList.remove('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+        
+        document.getElementById('sort-recent').classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+        document.getElementById('sort-asc').classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+        document.getElementById('sort-desc').classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+        
+        document.getElementById(`sort-${option}`).classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+        document.getElementById(`sort-${option}`).classList.add('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+        
+        // Apply filters
+        applyFilters();
+    }
+
+    // Fonction pour réinitialiser les filtres
+    function resetFilters() {
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        document.getElementById('zone-filter').value = '';
+        document.getElementById('category-filter').value = '';
+        document.getElementById('search-input').value = '';
+        setSortOption('recent');
+        
+        // Réappliquer les filtres
+        applyFilters();
+    }
+
+    // Fonction pour appliquer les filtres
+    function applyFilters() {
+        const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
+        const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
+        const zoneSearch = document.getElementById('zone-filter').value.toLowerCase();
+        const categorySearch = document.getElementById('category-filter').value;
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const sortOption = document.querySelector('.sort-btn.active')?.dataset.sort || 'recent';
+        
+        const products = document.querySelectorAll('.product-card');
+        let visibleCount = 0;
+        
+        // Filtrer les produits
+        products.forEach(product => {
+            const price = parseFloat(product.dataset.price);
+            const zone = product.dataset.zone.toLowerCase();
+            const category = product.dataset.categorie;
+            const name = product.dataset.name;
+            const entreprise = product.dataset.entreprise;
+            const date = parseInt(product.dataset.date);
+            
+            const priceMatch = price >= minPrice && price <= maxPrice;
+            const zoneMatch = !zoneSearch || zone.includes(zoneSearch);
+            const categoryMatch = !categorySearch || category === categorySearch;
+            const searchMatch = !searchTerm || 
+                               name.includes(searchTerm) || 
+                               entreprise.includes(searchTerm);
+            
+            if (priceMatch && zoneMatch && categoryMatch && searchMatch) {
+                product.style.display = 'block';
+                visibleCount++;
+            } else {
+                product.style.display = 'none';
+            }
+        });
+        
+        // Trier les produits
+        const container = document.getElementById('products-container');
+        const productArray = Array.from(products).filter(p => p.style.display !== 'none');
+        
+        productArray.sort((a, b) => {
+            const priceA = parseFloat(a.dataset.price);
+            const priceB = parseFloat(b.dataset.price);
+            const dateA = parseInt(a.dataset.date);
+            const dateB = parseInt(b.dataset.date);
+            
+            if (sortOption === 'asc') return priceA - priceB;
+            if (sortOption === 'desc') return priceB - priceA;
+            return dateB - dateA; // Par défaut: plus récent en premier
+        });
+        
+        // Réorganiser les produits dans le DOM
+        productArray.forEach(product => {
+            container.appendChild(product);
+        });
+        
+        // Afficher/masquer le message "Aucun résultat"
+        document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+        document.getElementById('products-count').textContent = visibleCount;
+        
+        // Afficher le compteur filtré
+        const filteredCount = document.getElementById('filtered-count');
+        const filteredNumber = document.getElementById('filtered-number');
+        
+        if (minPrice || maxPrice || zoneSearch || categorySearch || searchTerm) {
+            filteredCount.classList.remove('hidden');
+            filteredNumber.textContent = visibleCount;
+        } else {
+            filteredCount.classList.add('hidden');
+        }
+        
+        // Mettre à jour les filtres actifs
+        updateActiveFiltersDisplay();
+    }
+
+    // Mettre à jour l'affichage des filtres actifs
+    function updateActiveFiltersDisplay() {
+        const activeFiltersContainer = document.getElementById('active-filters');
+        activeFiltersContainer.innerHTML = '';
+        
+        const minPrice = document.getElementById('min-price').value;
+        const maxPrice = document.getElementById('max-price').value;
+        const zoneFilter = document.getElementById('zone-filter').value;
+        const categoryFilter = document.getElementById('category-filter').value;
+        const searchTerm = document.getElementById('search-input').value;
+        
+        let hasActiveFilters = false;
+        
+        if (zoneFilter) {
+            addActiveFilter('Localisation: ' + zoneFilter, 'zone');
+            hasActiveFilters = true;
+        }
+        
+        if (categoryFilter) {
+            const categoryText = document.getElementById('category-filter').options[document.getElementById('category-filter').selectedIndex].text;
+            addActiveFilter('Catégorie: ' + categoryText, 'category');
+            hasActiveFilters = true;
+        }
+        
+        if (minPrice || maxPrice) {
+            let priceText = 'Prix: ';
+            if (minPrice && maxPrice) {
+                priceText += `${minPrice} - ${maxPrice} FCFA`;
+            } else if (minPrice) {
+                priceText += `À partir de ${minPrice} FCFA`;
+            } else {
+                priceText += `Jusqu'à ${maxPrice} FCFA`;
+            }
+            addActiveFilter(priceText, 'price');
+            hasActiveFilters = true;
+        }
+        
+        if (searchTerm) {
+            addActiveFilter('Recherche: "' + searchTerm + '"', 'search');
+            hasActiveFilters = true;
+        }
+        
+        activeFiltersContainer.classList.toggle('hidden', !hasActiveFilters);
+    }
+    
+    // Ajouter un filtre actif
+    function addActiveFilter(text, type) {
+        const chip = document.createElement('div');
+        chip.className = 'flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300';
+        chip.innerHTML = `
+            ${text}
+            <button onclick="removeFilter('${type}')" class="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        document.getElementById('active-filters').appendChild(chip);
+    }
+    
+    // Supprimer un filtre spécifique
+    function removeFilter(type) {
+        switch(type) {
+            case 'zone':
+                document.getElementById('zone-filter').value = '';
+                break;
+            case 'category':
+                document.getElementById('category-filter').value = '';
+                break;
+            case 'price':
+                document.getElementById('min-price').value = '';
+                document.getElementById('max-price').value = '';
+                break;
+            case 'search':
+                document.getElementById('search-input').value = '';
+                break;
+        }
+        applyFilters();
+    }
+
+    // Fermer un popup générique
+    function closePopup(id) {
+        const content = document.getElementById(`${id}-content`);
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            document.getElementById(id).classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+
+    // Afficher la modal newsletter
+    function showNewsletterModal() {
+        const popup = document.getElementById('newsletter-modal');
+        const content = document.getElementById('newsletter-modal-content');
+        popup.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+        document.body.classList.add('overflow-hidden');
+    }
+
+    // Afficher une notification de succès
+    function showSuccessNotification(message) {
+        const notification = document.getElementById('success-notification');
+        const messageElement = document.getElementById('notification-message');
+        
+        messageElement.textContent = message;
+        notification.classList.remove('translate-x-full');
+        
+        setTimeout(() => {
+            notification.classList.add('translate-x-full');
+        }, 3000);
+    }
+
+    // Faire défiler jusqu'à la section des promotions
+    function scrollToPromotions() {
+        document.getElementById('promotions').scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply filters when any filter changes
+        document.getElementById('min-price').addEventListener('input', applyFilters);
+        document.getElementById('max-price').addEventListener('input', applyFilters);
+        document.getElementById('zone-filter').addEventListener('input', applyFilters);
+        document.getElementById('category-filter').addEventListener('change', applyFilters);
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+        
+        // Set default sort to recent
+        setSortOption('recent');
+        
+        // Newsletter form submission
+        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate form submission
+            setTimeout(() => {
+                closePopup('newsletter-modal');
+                showSuccessNotification('Merci pour votre inscription à notre newsletter !');
+                this.reset();
+            }, 1000);
+        });
+        
+        // Apply filters on load
+        applyFilters();
+    });
+</script>
+
+<style>
+    /* Typing cursor effect */
+    .typing-text::after {
+        content: '|';
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+    
+    /* Glow effect on hover */
+    .glow-on-hover {
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .glow-on-hover:hover {
+        box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+    }
+    
+    /* Gradient text */
+    .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+    
+    /* Smooth transitions */
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+    
+    /* Modern shadows */
+    .shadow-2xl {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Dark mode transitions */
+    .dark .product-card {
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: rgba(168, 85, 247, 0.5);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(168, 85, 247, 0.7);
+    }
+    
+    /* Backdrop blur for modals */
+    .backdrop-blur-sm {
+        backdrop-filter: blur(4px);
+    }
+    
+    /* Button hover effects */
+    .hover\:opacity-90:hover {
+        opacity: 0.9;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        #products-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .flex.justify-between.items-start {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+    
+    /* Animation for popups */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* WhatsApp button highlight */
+    .whatsapp-btn {
+        background-color: #25D366;
+        transition: all 0.3s ease;
+    }
+    
+    .whatsapp-btn:hover {
+        background-color: #128C7E;
+        transform: translateY(-2px);
+    }
+    
+    /* Pulse animation */
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .animate-pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    /* Bounce animation */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    .animate-bounce {
+        animation: bounce 1s infinite;
+    }
+    
+    /* Product image overlay */
+    .product-card .relative.h-48::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+        z-index: 10;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr" class="{% if request.user.is_authenticated %}user-authenticated{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}PromoSite{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Animations futuristes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+            will-change: opacity, transform;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Transition fluide pour le mode nuit */
+        .transition-mode {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+        }
+
+        /* Variables CSS futuristes */
+        :root {
+            --bg-primary: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --header-border: rgba(229, 231, 235, 0.5);
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --menu-bg: #ffffff;
+            --menu-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --menu-hover: #f3f4f6;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --glow-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .dark-mode {
+            --bg-primary: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --header-border: rgba(30, 41, 59, 0.5);
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --menu-bg: #1e293b;
+            --menu-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --menu-hover: #334155;
+            --accent-color: #818cf8;
+            --accent-hover: #6366f1;
+            --glow-color: rgba(129, 140, 248, 0.1);
+        }
+
+        /* Styles de base */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Header futuriste avec flou et effet de verre */
+        header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--header-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Liens avec effet néon */
+        .nav-link {
+            position: relative;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+            transition: width 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        /* Menu utilisateur futuriste */
+        .user-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            margin-top: 0.5rem;
+            min-width: 12rem;
+            background-color: var(--menu-bg);
+            border-radius: 0.75rem;
+            box-shadow: var(--menu-shadow);
+            z-index: 1000;
+            transform-origin: top right;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+        }
+
+        .user-menu.show {
+            display: block;
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .user-menu a {
+            display: block;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .user-menu a:hover {
+            background-color: var(--menu-hover);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 1.5rem;
+        }
+
+        /* Avatar futuriste */
+        .default-avatar {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        /* Bouton hamburger animé futuriste */
+        .hamburger {
+            width: 28px;
+            height: 24px;
+            position: relative;
+            transform: rotate(0deg);
+            transition: all 0.5s ease-in-out;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: currentColor;
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: all 0.25s ease-in-out;
+        }
+
+        .hamburger span:nth-child(1) {
+            top: 0;
+            transform-origin: left center;
+        }
+
+        .hamburger span:nth-child(2) {
+            top: 10px;
+            transform-origin: left center;
+        }
+
+        .hamburger span:nth-child(3) {
+            top: 20px;
+            transform-origin: left center;
+        }
+
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg);
+            top: -1px;
+            left: 6px;
+            width: 110%;
+        }
+
+        .hamburger.open span:nth-child(2) {
+            width: 0%;
+            opacity: 0;
+        }
+
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg);
+            top: 21px;
+            left: 6px;
+            width: 110%;
+        }
+
+        /* Menu mobile futuriste */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: max-height;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        #mobile-menu.open {
+            max-height: 1000px;
+        }
+
+        #mobile-menu .nav-link {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--header-border);
+        }
+
+        /* Overlay futuriste */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .mobile-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Bouton mode nuit futuriste */
+        #toggle-dark-mode {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            border-radius: 12px;
+            background: var(--card-border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        #toggle-dark-mode:hover {
+            background: var(--accent-color);
+        }
+
+        #toggle-dark-mode::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .dark-mode #toggle-dark-mode::before {
+            transform: translateX(20px);
+            background: #1e293b;
+        }
+
+        /* Effet de halo futuriste */
+        .halo-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .halo-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--glow-color) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+
+        .halo-effect:hover::after {
+            opacity: 1;
+        }
+
+        /* Logo avec effet de dégradé */
+        .logo-gradient {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Footer futuriste */
+        footer {
+            background-color: var(--header-bg);
+            border-top: 1px solid var(--header-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Barre de navigation mobile futuriste */
+        .mobile-nav-item {
+            position: relative;
+            padding: 0.75rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-item i {
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav-item:hover i {
+            transform: translateY(-3px);
+        }
+
+        .mobile-nav-item:hover span {
+            color: var(--accent-color);
+        }
+
+        /* Optimisations pour mobile */
+        @media (max-width: 767px) {
+            .nav-link:after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 transition-mode">
+    <!-- Header futuriste -->
+    <header class="fixed top-0 w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold logo-gradient">PromoSite</a>
+            
+            <!-- Navigation desktop futuriste -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="/" class="nav-link">Accueil</a>
+                <a href="/entreprise" class="nav-link">Entreprises</a>
+                <a href="/archives" class="nav-link">Archives</a>
+                <a href="/contact" class="nav-link">Contact</a>
+                
+                {% if user.is_authenticated %}
+                <!-- Menu utilisateur futuriste -->
+                <div class="relative" id="user-menu-container">
+                    <button id="user-menu-button" class="flex items-center space-x-3 focus:outline-none group" aria-expanded="false" aria-haspopup="true">
+                        <span class="font-medium">{{ user.email }}</span>
+                        {% if user.entreprise and user.entreprise.logo %}
+                            <div class="relative group">
+                                <img src="{{ user.entreprise.logo.url }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover transition-all group-hover:ring-2 group-hover:ring-accent-color">
+                            </div>
+                        {% else %}
+                            <div class="default-avatar w-9 h-9 rounded-full flex items-center justify-center text-lg">
+                                {{ user.email|first|upper }}
+                            </div>
+                        {% endif %}
+                    </button>
+                    <div id="user-menu" class="user-menu">
+                        <a href="{% url 'dashboard_entreprise' %}" class="flex items-center">
+                            <i class="fas fa-tachometer-alt mr-3 text-accent-color"></i>
+                            Tableau de bord
+                        </a>
+                        <a href="{% url 'profile' %}" class="flex items-center">
+                            <i class="fas fa-user-cog mr-3 text-accent-color"></i>
+                            Mon profil
+                        </a>
+                        <a href="{% url 'logout' %}" class="flex items-center">
+                            <i class="fas fa-sign-out-alt mr-3 text-accent-color"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="nav-link">Connexion</a>
+                {% endif %}
+                
+                <button id="toggle-dark-mode" class="ml-4 focus:outline-none">
+                    <div id="toggle-dark-mode-inner"></div>
+                </button>
+            </div>
+            
+            <!-- Bouton hamburger futuriste -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="hamburger focus:outline-none">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Menu mobile futuriste -->
+        <div id="mobile-menu" class="md:hidden overflow-hidden">
+            <div class="px-4 py-3 border-t border-opacity-10" style="border-color: var(--header-border);">
+                <a href="/" class="nav-link flex items-center">
+                    <i class="fas fa-home mr-3 text-accent-color"></i>
+                    Accueil
+                </a>
+                <a href="/entreprise" class="nav-link flex items-center">
+                    <i class="fas fa-building mr-3 text-accent-color"></i>
+                    Entreprises
+                </a>
+                <a href="/archives" class="nav-link flex items-center">
+                    <i class="fas fa-archive mr-3 text-accent-color"></i>
+                    Archives
+                </a>
+                <a href="/contact" class="nav-link flex items-center">
+                    <i class="fas fa-envelope mr-3 text-accent-color"></i>
+                    Contact
+                </a>
+                
+                {% if user.is_authenticated %}
+                <div class="pt-4 mt-4 border-t border-opacity-10" style="border-color: var(--header-border);">
+                    <div class="flex items-center px-2 py-3">
+                        {% if user.entreprise and user.entreprise.logo %}
+                            <img src="{{ user.entreprise.logo.url }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover mr-3">
+                        {% else %}
+                            <div class="default-avatar w-10 h-10 rounded-full flex items-center justify-center text-lg mr-3">
+                                {{ user.email|first|upper }}
+                            </div>
+                        {% endif %}
+                        <span class="font-medium">{{ user.email }}</span>
+                    </div>
+                    <a href="{% url 'dashboard_entreprise' %}" class="nav-link flex items-center">
+                        <i class="fas fa-tachometer-alt mr-3 text-accent-color"></i>
+                        Tableau de bord
+                    </a>
+                    <a href="{% url 'profile' %}" class="nav-link flex items-center">
+                        <i class="fas fa-user-cog mr-3 text-accent-color"></i>
+                        Mon profil
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-link flex items-center">
+                        <i class="fas fa-sign-out-alt mr-3 text-accent-color"></i>
+                        Déconnexion
+                    </a>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="nav-link flex items-center">
+                    <i class="fas fa-sign-in-alt mr-3 text-accent-color"></i>
+                    Connexion
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Overlay futuriste -->
+    <div id="mobile-overlay" class="mobile-overlay"></div>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-4 pt-24 pb-20 md:pt-28 md:pb-16">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer futuriste -->
+    <footer class="fixed bottom-0 w-full z-40">
+        <div class="container mx-auto text-center py-3">
+            <p class="text-sm">&copy; 2025 PromoSite. Tous droits réservés.</p>
+        </div>
+        
+        <!-- Navigation mobile futuriste -->
+        <div class="md:hidden flex justify-around items-center py-3 px-4">
+            <a href="/" class="mobile-nav-item flex flex-col items-center text-xs">
+                <i class="fas fa-home text-lg mb-1"></i>
+                <span>Accueil</span>
+            </a>
+            <a href="/entreprise" class="mobile-nav-item flex flex-col items-center text-xs">
+                <i class="fas fa-building text-lg mb-1"></i>
+                <span>Entreprises</span>
+            </a>
+            <a href="/archives" class="mobile-nav-item flex flex-col items-center text-xs">
+                <i class="fas fa-archive text-lg mb-1"></i>
+                <span>Archives</span>
+            </a>
+            <a href="/contact" class="mobile-nav-item flex flex-col items-center text-xs">
+                <i class="fas fa-envelope text-lg mb-1"></i>
+                <span>Contact</span>
+            </a>
+        </div>
+    </footer>
+
+    <!-- Scripts JavaScript futuristes -->
+    <script>
+        // Gestion du menu utilisateur futuriste
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = userMenuButton.getAttribute('aria-expanded') === 'true';
+                userMenuButton.setAttribute('aria-expanded', !isExpanded);
+                userMenu.classList.toggle('show');
+                
+                // Ajout d'un effet sonore subtil (optionnel)
+                const audio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+                audio.volume = 0.2;
+                audio.play().catch(e => {});
+            });
+            
+            // Fermer le menu en cliquant à l'extérieur
+            document.addEventListener('click', (event) => {
+                if (!document.getElementById('user-menu-container').contains(event.target)) {
+                    userMenu.classList.remove('show');
+                    userMenuButton.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+        
+        // Menu mobile futuriste
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+        const body = document.body;
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenuButton.classList.toggle('open');
+                mobileMenu.classList.toggle('open');
+                mobileOverlay.classList.toggle('show');
+                body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+                
+                // Animation sonore (optionnelle)
+                if (mobileMenu.classList.contains('open')) {
+                    const audio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+                    audio.volume = 0.1;
+                    audio.play().catch(e => {});
+                }
+            });
+            
+            // Fermer le menu en cliquant sur l'overlay
+            mobileOverlay.addEventListener('click', () => {
+                mobileMenuButton.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                mobileOverlay.classList.remove('show');
+                body.style.overflow = '';
+            });
+        }
+
+        // Mode Nuit futuriste
+        const toggleDarkMode = document.getElementById('toggle-dark-mode');
+        
+        // Vérifier les préférences système et le localStorage
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const storedTheme = localStorage.getItem('theme');
+        
+        // Appliquer le thème au chargement
+        function applyTheme(isDark) {
+            if (isDark) {
+                document.documentElement.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+            applyTheme(true);
+        } else {
+            applyTheme(false);
+        }
+        
+        // Basculer entre mode nuit et mode jour
+        if (toggleDarkMode) {
+            toggleDarkMode.addEventListener('click', function() {
+                const isDark = document.documentElement.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                
+                // Effet de transition fluide
+                document.documentElement.style.transition = 'background-color 0.5s ease, color 0.5s ease';
+                
+                // Son de transition (optionnel)
+                const audio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+                audio.volume = 0.1;
+                audio.play().catch(e => {});
+            });
+        }
+        
+        // Écouter les changements de préférence système
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches);
+            }
+        });
+        
+        // Animations au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Effet de fondu enchaîné pour les cartes
+            const cards = document.querySelectorAll('.fade-in');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+            
+            // Effet de parallaxe subtil (optionnel)
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('[data-parallax]');
+                
+                parallaxElements.forEach(element => {
+                    const speed = parseFloat(element.getAttribute('data-parallax-speed')) || 0.3;
+                    const yPos = -(scrollPosition * speed);
+                    element.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                });
+            }, { passive: true });
+        });
+        
+        // Effet de halo interactif
+        const haloElements = document.querySelectorAll('.halo-effect');
+        haloElements.forEach(element => {
+            element.addEventListener('mousemove', (e) => {
+                const rect = element.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                element.style.setProperty('--x', `${x}px`);
+                element.style.setProperty('--y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>

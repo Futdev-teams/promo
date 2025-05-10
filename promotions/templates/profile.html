@@ -1,0 +1,139 @@
+<!-- profile.html -->
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil - PromoSite{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 max-w-3xl">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+        <h1 class="text-2xl font-bold mb-6">Mon Profil</h1>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
+            
+            <div class="mt-6 flex justify-center max-w-xl">
+            <a href="{% url 'dashboard_entreprise' %}" class="px-6 py-2.5 rounded-lg bg-gray-100 text-gray-700 font-medium transition-all duration-300 hover:bg-gray-200 flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>Annuler</span>
+                        </a>
+
+                        
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-orange-600 hover:to-purple-700 transition">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Image preview functionality
+    document.getElementById('id_image').addEventListener('change', function(event) {
+        const preview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const file = event.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            preview.classList.add('hidden');
+        }
+    });
+
+    // Character counter for description
+    const descriptionField = document.getElementById('id_description');
+    const charCount = document.getElementById('charCount');
+    
+    if (descriptionField) {
+        descriptionField.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+        
+        // Set initial count
+        charCount.textContent = descriptionField.value.length;
+        
+        // Style the textarea
+        descriptionField.classList.add('w-full', 'px-3', 'py-2', 'min-h-[120px]', 'text-gray-700', 'focus:outline-none', 'focus:ring-0', 'resize-none');
+    }
+</script>
+
+<style>
+    /* Custom styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Grid background pattern */
+    .bg-grid-light {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23e5e7eb'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+    }
+    
+    /* Custom pulse animation */
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    
+    /* Input styles */
+    input, textarea, select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        color: #111827;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Select dropdown arrow */
+    select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background-color: #f3f4f6;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #9ca3af;
+    }
+</style>
+{% endblock %}

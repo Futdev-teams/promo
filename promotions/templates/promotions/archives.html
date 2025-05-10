@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white p-6 transition-colors duration-300">
+    <!-- Titre -->
+    <h1 class="text-4xl font-bold mb-8 text-center animate-fade-in">Promotions Archivés </h1>
+
+    <!-- Conteneur principal -->
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Filtres à gauche -->
+        <aside class="w-full md:w-1/4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl animate-slide-in-left">
+            <h2 class="text-2xl font-bold mb-6 text-blue-500 dark:text-blue-400">Filtres</h2>
+            <div class="mb-6">
+                <label for="price-min" class="block text-gray-700 dark:text-gray-300 mb-2">Prix min (FCFA)</label>
+                <input type="number" id="price-min" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Prix minimum">
+            </div>
+            <div class="mb-6">
+                <label for="price-max" class="block text-gray-700 dark:text-gray-300 mb-2">Prix max (FCFA)</label>
+                <input type="number" id="price-max" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Prix maximum">
+            </div>
+            <div class="mb-6">
+                <label for="zone" class="block text-gray-700 dark:text-gray-300 mb-2">Zone</label>
+                <input type="text" id="zone" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Rechercher par zone...">
+            </div>
+            <div class="mb-6">
+                <label for="categorie" class="block text-gray-700 dark:text-gray-300 mb-2">Catégorie</label>
+                <select id="categorie" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    <option value="">Toutes catégories</option>
+                    {% for categorie in categories %}
+                    <option value="{{ categorie.nom }}">{{ categorie.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 dark:text-gray-300 mb-2">Trier par :</label>
+                <div class="mt-2">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="sort" value="asc" class="form-radio h-5 w-5 text-orange-500">
+                        <span class="ml-2">Prix croissant</span>
+                    </label>
+                    <label class="inline-flex items-center ml-4">
+                        <input type="radio" name="sort" value="desc" class="form-radio h-5 w-5 text-orange-500">
+                        <span class="ml-2">Prix décroissant</span>
+                    </label>
+                    <label class="inline-flex items-center ml-4 block mt-2">
+                        <input type="radio" name="sort" value="recent" class="form-radio h-5 w-5 text-orange-500" checked>
+                        <span class="ml-2">Plus récent</span>
+                    </label>
+                </div>
+            </div>
+            <button onclick="resetFilters()" class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">Réinitialiser</button>
+        </aside>
+
+        <!-- Cards produits -->
+        <main class="w-full md:w-3/4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-container">
+                {% for produit in produits %}
+                <div class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-3xl animate-fade-in relative" 
+                     data-price="{{ produit.prix_promotionnel }}"
+                     data-zone="{{ produit.entreprise.localisation }}"
+                     data-categorie="{{ produit.categorie.nom }}"
+                     data-date="{{ produit.date_debut_promo|date:'U' }}">
+                    <!-- Image du produit -->
+                    <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" class="w-full h-48 object-cover">
+
+                    <!-- Contenu de la carte -->
+                    <div class="p-6">
+                        <div class="flex items-center justify-between w-full">
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ produit.nom }}</h2>
+                            <img src="{{ produit.entreprise.logo.url }}" alt="{{ produit.entreprise.nom }}" class="w-10 h-10 rounded-full object-cover shadow-md">
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-500 mt-2">
+                            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded">Début: {{ produit.date_debut_promo|date:"d/m/Y H:i" }}</span>
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded">Fin: {{ produit.date_fin_promo|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500 line-through">Prix : {{ produit.prix }} FCFA</p>
+                            <p class="product-price-promo text-lg font-bold text-red-500">Promo : {{ produit.prix_promotionnel }} FCFA</p>
+                            <p class="text-sm text-green-600">Taux de promo : {{ produit.discount_percentage }}%</p>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <button onclick="openContactPopup('{{ produit.entreprise.nom }}', '{{ produit.nom }}', '{{ produit.entreprise.telephone }}', '{{ produit.entreprise.email }}')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-transform hover:scale-105">Contacter</button>
+                            <a href="{% url 'entreprise_detail' produit.entreprise.id %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-transform hover:scale-105">Entreprise</a>
+                            <button onclick="openDetailsPopup('{{ produit.nom }}', '{{ produit.description }}', '{{ produit.prix }}', '{{ produit.prix_promotionnel }}', '{{ produit.discount_percentage }}', '{{ produit.date_debut_promo|date:"d/m/Y H:i" }}', '{{ produit.date_fin_promo|date:"d/m/Y H:i" }}', '{{ produit.entreprise.nom }}', '{{ produit.entreprise.email }}', '{{ produit.entreprise.telephone }}', '{{ produit.entreprise.localisation }}', '{{ produit.entreprise.logo.url }}', '{{ produit.entreprise.banniere.url }}', '{{ produit.image.url }}')" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-transform hover:scale-105">Détails</button>
+                        </div>
+                    </div>
+
+                    <!-- Effet de bordure futuriste -->
+                    <div class="absolute inset-0 border-2 border-white/10 rounded-xl pointer-events-none"></div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Message quand aucun résultat -->
+            <div id="no-results" class="hidden text-center py-10">
+                <h3 class="text-2xl font-bold text-gray-500 dark:text-gray-400">Aucun résultat trouvé</h3>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Essayez d'ajuster vos filtres de recherche</p>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Pop-up de contact -->
+<div id="contact-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeContactPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl font-bold mb-4 text-blue-500 dark:text-blue-400">Contacter l'entreprise</h2>
+        <div class="mb-4">
+            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Entreprise:</span> <span id="contact-entreprise"></span></p>
+            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Produit:</span> <span id="contact-produit"></span></p>
+        </div>
+        <div class="mb-4">
+            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Téléphone:</span> <span id="contact-telephone"></span></p>
+            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Email:</span> <span id="contact-email"></span></p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-3 mt-6">
+            <a id="contact-call" href="#" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center flex-1 min-w-[150px] justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                Appeler
+            </a>
+            <a id="contact-whatsapp" href="#" class="bg-[#25D366] text-white px-4 py-2 rounded-lg hover:bg-[#128C7E] flex items-center flex-1 min-w-[150px] justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.018c1.276-.36 2.5-1.238 3.239-2.22l-1.003-.604c-.26.15-.584.234-.928.234-1.035 0-1.875-.84-1.875-1.875v-.468c-.477.266-1.03.422-1.625.422-1.929 0-3.5-1.571-3.5-3.5 0-.595.156-1.148.422-1.625h-.468c-1.036 0-1.875.84-1.875 1.875v6.5c0 1.035.84 1.875 1.875 1.875h6.5c1.036 0 1.875-.84 1.875-1.875v-.094l-.031-.031M12 2.5C6.201 2.5 1.5 7.201 1.5 13c0 1.802.48 3.489 1.32 4.941l-1.246 3.73 3.847-1.229A10.456 10.456 0 0012 23.5c5.799 0 10.5-4.701 10.5-10.5S17.799 2.5 12 2.5"/>
+                </svg>
+                WhatsApp
+            </a>
+            <a id="contact-mail" href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center flex-1 min-w-[150px] justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                </svg>
+                Email
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Pop-up de détails -->
+<div id="details-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-2xl relative">
+        <button onclick="closeDetailsPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Image du produit -->
+            <div class="w-full md:w-1/2">
+                <img id="popup-image" src="" alt="Produit" class="w-full h-64 object-cover rounded-lg">
+            </div>
+            <!-- Détails du produit -->
+            <div class="w-full md:w-1/2">
+                <h2 id="popup-nom" class="text-2xl font-bold text-gray-900 dark:text-white mb-2"></h2>
+                <p id="popup-description" class="text-gray-700 dark:text-gray-300 text-sm mb-4"></p>
+                <div class="flex justify-between text-sm text-gray-500 mt-2">
+                    <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded">Début: <span id="popup-debut"></span></span>
+                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded">Fin: <span id="popup-fin"></span></span>
+                </div>
+                <div class="mt-2">
+                    <p class="text-sm text-gray-500 line-through">Prix : <span id="popup-prix"></span> FCFA</p>
+                    <p class="text-lg font-bold text-red-500">Promo : <span id="popup-promo"></span> FCFA</p>
+                    <p class="text-sm text-green-600">Taux de promo : <span id="popup-taux"></span>%</p>
+                </div>
+                <!-- Informations de l'entreprise -->
+                <div class="mt-4">
+                    <div class="flex items-center gap-4">
+                        <img id="popup-logo" src="" alt="Logo" class="w-10 h-10 rounded-full object-cover shadow-md">
+                        <div>
+                            <p class="text-sm text-gray-500">Entreprise: <span id="popup-entreprise"></span></p>
+                            <p class="text-sm text-gray-500">Email: <span id="popup-email"></span></p>
+                            <p class="text-sm text-gray-500">Contact: <span id="popup-contact"></span></p>
+                            <p class="text-sm text-gray-500">Localisation: <span id="popup-localisation"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-center">
+                    <button onclick="openContactPopup(document.getElementById('popup-entreprise').textContent, document.getElementById('popup-nom').textContent, document.getElementById('popup-contact').textContent, document.getElementById('popup-email').textContent)" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-transform hover:scale-105">
+                        Contacter l'entreprise
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fonction pour ouvrir le pop-up de contact
+    function openContactPopup(entreprise, produit, telephone, email) {
+        document.getElementById('contact-entreprise').textContent = entreprise;
+        document.getElementById('contact-produit').textContent = produit;
+        document.getElementById('contact-telephone').textContent = telephone;
+        document.getElementById('contact-email').textContent = email;
+        
+        // Configurer les liens d'action
+        document.getElementById('contact-call').href = 'tel:' + telephone;
+        document.getElementById('contact-whatsapp').href = 'https://wa.me/' + telephone.replace(/\D/g, '');
+        document.getElementById('contact-mail').href = 'mailto:' + email;
+        
+        document.getElementById('contact-popup').classList.remove('hidden');
+    }
+
+    // Fonction pour fermer le pop-up de contact
+    function closeContactPopup() {
+        document.getElementById('contact-popup').classList.add('hidden');
+    }
+
+    // Fonction pour ouvrir le pop-up de détails
+    function openDetailsPopup(nom, description, prix, prixPromo, tauxPromo, debut, fin, entrepriseNom, email, contact, localisation, logo, banniere, image) {
+        document.getElementById('popup-nom').textContent = nom;
+        document.getElementById('popup-description').textContent = description;
+        document.getElementById('popup-prix').textContent = prix;
+        document.getElementById('popup-promo').textContent = prixPromo;
+        document.getElementById('popup-taux').textContent = tauxPromo;
+        document.getElementById('popup-debut').textContent = debut;
+        document.getElementById('popup-fin').textContent = fin;
+        document.getElementById('popup-entreprise').textContent = entrepriseNom;
+        document.getElementById('popup-email').textContent = email;
+        document.getElementById('popup-contact').textContent = contact;
+        document.getElementById('popup-localisation').textContent = localisation;
+        document.getElementById('popup-logo').src = logo;
+        document.getElementById('popup-image').src = image;
+        document.getElementById('details-popup').classList.remove('hidden');
+    }
+
+    // Fonction pour fermer le pop-up de détails
+    function closeDetailsPopup() {
+        document.getElementById('details-popup').classList.add('hidden');
+    }
+
+    // Fonction pour réinitialiser les filtres
+    function resetFilters() {
+        document.getElementById('price-min').value = '';
+        document.getElementById('price-max').value = '';
+        document.getElementById('zone').value = '';
+        document.getElementById('categorie').value = '';
+        document.querySelector('input[name="sort"][value="recent"]').checked = true;
+        
+        // Réappliquer les filtres
+        applyFilters();
+    }
+
+    // Fonction pour appliquer les filtres
+    function applyFilters() {
+        const minPrice = parseFloat(document.getElementById('price-min').value) || 0;
+        const maxPrice = parseFloat(document.getElementById('price-max').value) || Infinity;
+        const zoneSearch = document.getElementById('zone').value.toLowerCase();
+        const selectedCategory = document.getElementById('categorie').value;
+        const sortOption = document.querySelector('input[name="sort"]:checked').value;
+        
+        const products = document.querySelectorAll('.card');
+        let visibleCount = 0;
+        
+        // Filtrer les produits
+        products.forEach(product => {
+            const price = parseFloat(product.dataset.price);
+            const zone = product.dataset.zone.toLowerCase();
+            const category = product.dataset.categorie;
+            const date = parseInt(product.dataset.date);
+            
+            const priceMatch = price >= minPrice && price <= maxPrice;
+            const zoneMatch = !zoneSearch || zone.includes(zoneSearch);
+            const categoryMatch = !selectedCategory || category === selectedCategory;
+            
+            if (priceMatch && zoneMatch && categoryMatch) {
+                product.style.display = 'block';
+                visibleCount++;
+            } else {
+                product.style.display = 'none';
+            }
+        });
+        
+        // Trier les produits
+        const container = document.getElementById('products-container');
+        const productArray = Array.from(products).filter(p => p.style.display !== 'none');
+        
+        productArray.sort((a, b) => {
+            const priceA = parseFloat(a.dataset.price);
+            const priceB = parseFloat(b.dataset.price);
+            const dateA = parseInt(a.dataset.date);
+            const dateB = parseInt(b.dataset.date);
+            
+            if (sortOption === 'asc') return priceA - priceB;
+            if (sortOption === 'desc') return priceB - priceA;
+            return dateB - dateA; // Par défaut: plus récent en premier
+        });
+        
+        // Réorganiser les produits dans le DOM
+        productArray.forEach(product => {
+            container.appendChild(product);
+        });
+        
+        // Afficher/masquer le message "Aucun résultat"
+        document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    // Écouteurs d'événements pour les filtres
+    document.getElementById('price-min').addEventListener('input', applyFilters);
+    document.getElementById('price-max').addEventListener('input', applyFilters);
+    document.getElementById('zone').addEventListener('input', applyFilters);
+    document.getElementById('categorie').addEventListener('change', applyFilters);
+    document.querySelectorAll('input[name="sort"]').forEach(radio => {
+        radio.addEventListener('change', applyFilters);
+    });
+
+    // Initialiser les filtres au chargement
+    document.addEventListener('DOMContentLoaded', applyFilters);
+</script>
+
+<style>
+    /* Animations */
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
+    }
+
+    @keyframes slide-in-left {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-slide-in-left {
+        animation: slide-in-left 0.4s ease-out forwards;
+    }
+
+    /* Effets de transition */
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    /* Ombre portée moderne */
+    .shadow-2xl {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .shadow-3xl {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Effet de bordure futuriste */
+    .card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        border-radius: 16px;
+        z-index: -1;
+    }
+
+    /* Style des boutons */
+    button {
+        transition: all 0.3s ease;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Style des inputs */
+    input, select {
+        transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    }
+</style>
+{% endblock %}

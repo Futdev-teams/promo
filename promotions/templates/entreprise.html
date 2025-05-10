@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Entreprises - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white p-6 transition-colors duration-300">
+    <!-- Titre -->
+    <h1 class="text-4xl font-bold mb-8 text-center animate-fade-in">Liste des Entreprises</h1>
+
+    <!-- Conteneur principal -->
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Filtres à gauche -->
+        <aside class="w-full md:w-1/4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl animate-slide-in-left">
+            <h2 class="text-2xl font-bold mb-6 text-blue-500 dark:text-blue-400">Filtres</h2>
+            <div class="mb-6">
+                <label for="zone" class="block text-gray-700 dark:text-gray-300 mb-2">Zone</label>
+                <input type="text" id="zone" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Rechercher par zone">
+            </div>
+            <div class="mb-6">
+                <label for="search" class="block text-gray-700 dark:text-gray-300 mb-2">Rechercher par nom</label>
+                <input type="text" id="search" class="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Rechercher par nom">
+            </div>
+        </aside>
+
+        <!-- Cards entreprises -->
+        <main class="w-full md:w-3/4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="entreprises">
+                {% for entreprise in entreprises %}
+                <div class="card bg-white dark:bg-gray-800 rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-3xl animate-fade-in relative">
+                    <!-- Image avec effet de dégradé -->
+                    <div class="relative">
+                        <img src="{{ entreprise.logo.url }}" alt="{{ entreprise.nom }}" class="w-full h-48 object-cover">
+                        
+                    </div>
+
+                    <!-- Contenu de la carte -->
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ entreprise.nom }}</h2>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm mb-4">{{ entreprise.description }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Zone: {{ entreprise.localisation }}</p>
+                        <div class="flex gap-3">
+                            <a href="tel:{{ entreprise.telephone }}" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all">Appeler</a>
+                            <a href="mailto:{{ entreprise.email }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all">Email</a>
+                            <a href="{% url 'entreprise_detail' entreprise.id %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all">Détails</a>
+                        </div>
+                    </div>
+
+                    <!-- Effet de bordure futuriste -->
+                    <div class="absolute inset-0 border-2 border-white/10 rounded-xl pointer-events-none"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+// Filtres dynamiques (non sensibles à la casse)
+function applyFilters() {
+    const zone = document.getElementById('zone').value.toLowerCase();
+    const search = document.getElementById('search').value.toLowerCase();
+
+    const cards = Array.from(document.querySelectorAll('.card'));
+    
+    cards.forEach(card => {
+        const entrepriseZone = card.querySelector('p.text-sm.text-gray-500.dark\\:text-gray-400').textContent.toLowerCase();
+        const entrepriseNom = card.querySelector('h2.text-2xl.font-bold').textContent.toLowerCase();
+
+        if (entrepriseZone.includes(zone) && entrepriseNom.includes(search)) {
+            card.classList.remove('hidden');
+            card.classList.add('animate-fade-in');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+
+document.getElementById('zone').addEventListener('input', applyFilters);
+document.getElementById('search').addEventListener('input', applyFilters);
+
+// Mode nuit
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const body = document.body;
+
+themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('dark-mode', 'enabled');
+        themeIcon.textContent = '☀️';
+    } else {
+        localStorage.setItem('dark-mode', 'disabled');
+        themeIcon.textContent = '🌙';
+    }
+});
+
+// Vérifier l'état du mode nuit au chargement
+if (localStorage.getItem('dark-mode') === 'enabled') {
+    body.classList.add('dark-mode');
+    themeIcon.textContent = '☀️';
+}
+</script>
+
+<style>
+/* Animations */
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+}
+
+/* Effets de transition */
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+/* Ombre portée moderne */
+.shadow-2xl {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-3xl {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles pour le mode sombre */
+.dark-mode {
+    background-color: #2d3748;
+    color: #ffffff;
+}
+
+.dark-mode header, .dark-mode footer {
+    background-color: #1a202c;
+}
+
+.dark-mode .card {
+    background-color: #4a5568;
+}
+
+.dark-mode input, .dark-mode select {
+    background-color: #4a5568;
+    color: #ffffff;
+}
+
+/* Effet de bordure futuriste */
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 16px;
+    z-index: -1;
+}
+
+/* Style des boutons */
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+/* Style des inputs */
+input {
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+</style>
+{% endblock %}

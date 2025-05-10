@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier promotion - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header with edit icon -->
+        <div class="text-center mb-12">
+            <div class="inline-flex p-2 rounded-full bg-white dark:bg-gray-800 shadow-lg mb-4">
+                <div class="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
+                    <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">Modifier Promotion</span>
+            </h1>
+            <p class="mt-3 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Actualisez votre offre pour maximiser son impact
+            </p>
+        </div>
+
+        <!-- Form card with enhanced edit features -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
+            <div class="p-8">
+                <form method="post" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Nom du produit -->
+                        <div class="col-span-2">
+                            <label for="{{ form.nom.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    Nom du produit
+                                </span>
+                            </label>
+                            {{ form.nom }}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-span-2">
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Description
+                                </span>
+                            </label>
+                            {{ form.description }}
+                        </div>
+
+                        <!-- Image upload with current and new preview -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Image du produit
+                                </span>
+                            </label>
+                            <div class="mt-2 flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                                <!-- Current image -->
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Actuelle</span>
+                                    {% if form.instance.image %}
+                                        <img src="{{ form.instance.image.url }}" alt="Image actuelle" class="h-24 w-24 rounded-lg object-cover border-2 border-blue-500">
+                                    {% else %}
+                                        <div class="h-24 w-24 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Aucune image</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- New image preview -->
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Nouvelle</span>
+                                    <label for="id_image" class="cursor-pointer">
+                                        <div class="flex flex-col items-center justify-center h-24 w-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 transition-all duration-300 bg-gray-50 dark:bg-gray-700 overflow-hidden">
+                                            <svg class="h-8 w-8 text-gray-400 hover:text-blue-500 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                        </div>
+                                        {{ form.image }}
+                                    </label>
+                                    <div id="imagePreview" class="h-24 w-24 rounded-lg overflow-hidden hidden mt-2 border border-gray-200 dark:border-gray-600">
+                                        <img id="previewImage" class="h-full w-full object-cover" src="#" alt="Aperçu de la nouvelle image" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Catégorie -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label for="{{ form.categorie.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                    </svg>
+                                    Catégorie
+                                </span>
+                            </label>
+                            <div class="relative">
+                                {{ form.categorie }}
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prix et Prix promotionnel -->
+                        <div>
+                            <label for="{{ form.prix.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Prix original
+                                </span>
+                            </label>
+                            <div class="relative">
+                                {{ form.prix }}
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 dark:text-gray-400">€</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="{{ form.prix_promotionnel.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                    Prix promotionnel
+                                </span>
+                            </label>
+                            <div class="relative">
+                                {{ form.prix_promotionnel }}
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 dark:text-gray-400">€</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantité -->
+                        <div>
+                            <label for="{{ form.quantite.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                    Quantité disponible
+                                </span>
+                            </label>
+                            {{ form.quantite }}
+                        </div>
+
+                        <!-- Dates de promotion -->
+                        <div>
+                            <label for="{{ form.date_debut_promo.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Début de la promotion
+                                </span>
+                            </label>
+                            {{ form.date_debut_promo }}
+                        </div>
+
+                        <div>
+                            <label for="{{ form.date_fin_promo.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Fin de la promotion
+                                </span>
+                            </label>
+                            {{ form.date_fin_promo }}
+                        </div>
+                    </div>
+
+                    <!-- Form actions -->
+                    <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200 dark:border-gray-700">
+                        <a href="{% url 'dashboard_entreprise' %}" class="px-6 py-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-medium transition-all duration-300 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center space-x-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>Annuler</span>
+                        </a>
+                        <button type="submit" class="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium transition-all duration-300 hover:from-blue-600 hover:to-purple-700 shadow-md hover:shadow-lg flex items-center justify-center space-x-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Mettre à jour</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Image preview functionality
+    document.getElementById('id_image').addEventListener('change', function(event) {
+        const preview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const file = event.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            preview.classList.add('hidden');
+        }
+    });
+
+    // Character counter for description
+    const descriptionField = document.getElementById('id_description');
+    const charCount = document.getElementById('charCount');
+    
+    if (descriptionField) {
+        descriptionField.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+        
+        // Set initial count
+        charCount.textContent = descriptionField.value.length;
+        
+        // Style the textarea
+        descriptionField.classList.add('w-full', 'px-3', 'py-2', 'min-h-[120px]', 'text-gray-700', 'focus:outline-none', 'focus:ring-0', 'resize-none');
+    }
+</script>
+
+<style>
+    /* Custom styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Grid background pattern */
+    .bg-grid-light {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23e5e7eb'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+    }
+    
+    /* Custom pulse animation */
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    
+    /* Input styles */
+    input, textarea, select {
+        width: 100%;
+        margin:8px;
+        padding: 1.75rem 1rem;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        color: #111827;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+        margin:10px;
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Select dropdown arrow */
+    select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background-color: #f3f4f6;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #9ca3af;
+    }
+</style>
+{% endblock %}

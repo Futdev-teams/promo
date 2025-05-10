@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #0066ff; color: white; padding: 15px; text-align: center; }
+        .content { padding: 20px; border: 1px solid #ddd; border-top: none; }
+        .field { margin-bottom: 15px; }
+        .field-label { font-weight: bold; color: #0066ff; }
+        .footer { margin-top: 20px; font-size: 0.9em; color: #777; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Nouvelle demande d'inscription</h2>
+        </div>
+        
+        <div class="content">
+            <div class="field">
+                <span class="field-label">Entreprise:</span> {{ company_name }}
+            </div>
+            
+            <div class="field">
+                <span class="field-label">Type d'entreprise:</span> {{ business_type }}
+            </div>
+            
+            <div class="field">
+                <span class="field-label">Email:</span> {{ email }}
+            </div>
+            
+            <div class="field">
+                <span class="field-label">Téléphone:</span> {{ phone }}
+            </div>
+            
+            <div class="field">
+                <span class="field-label">Adresse:</span> {{ full_address }}
+            </div>
+            
+            <div class="field">
+                <span class="field-label">Lien Google Maps:</span> 
+                {% if location_link %}
+                    <a href="{{ location_link }}">Voir sur la carte</a>
+                {% else %}
+                    Non fourni
+                {% endif %}
+            </div>
+            
+            <div class="field">
+                <span class="field-label">Message additionnel:</span><br>
+                {% if message %}
+                    {{ message|linebreaks }}
+                {% else %}
+                    Aucun message additionnel
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Cet email a été envoyé depuis le formulaire de contact du site.</p>
+        </div>
+    </div>
+</body>
+</html>
