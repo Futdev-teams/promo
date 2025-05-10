@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Styles spécifiques à cette page */
+    .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+        text-align: center;
+    }
+    .form-container h2 {
+        color: #007bff;
+        font-weight: bold;
+        margin-bottom: 1em;
+    }
+    .form-control {
+        padding-left: 40px;
+        height: 40px;
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+    }
+    .form-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #007bff;
+    }
+    .input-group {
+        position: relative;
+        margin-bottom: 1.5em;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        font-weight: bold;
+    }
+    #resend-button {
+        background-color: #6c757d;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 15px;
+    }
+    #timer {
+        color: #6c757d;
+        font-size: 0.9em;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="container">
+    <div class="form-container mt-5">
+        <h2>Vérification de l'Email 🔑</h2>
+        <p>Veuillez entrer le code reçu par email pour vérifier votre compte.</p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="input-group">
+                <i class="fas fa-key form-icon"></i>
+                <input type="text" name="verification_code" id="verification_code" class="form-control" placeholder="Entrez le code de vérification" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Vérifier mon compte</button>
+        </form>
+        
+        <div id="timer">
+            <p>Vous pouvez renvoyer le code dans <span id="countdown">60</span> secondes.</p>
+        </div>
+        <p class="text-center mt-3">
+            Vous n'avez pas reçu de code ? <button id="resend-button" type="button" disabled>Renvoyer le code 📧</button>
+        </p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resendButton = document.getElementById('resend-button');
+    const countdownElem = document.getElementById('countdown');
+    let countdown = 60;
+    let delayTimes = [60, 300, 600, 3600]; // Delays: 1 min, 5 min, 10 min, 1 hour
+    let currentDelayIndex = 0;
+    let timer;
+
+    function updateCountdown() {
+        countdownElem.textContent = countdown;
+        if (countdown <= 0) {
+            resendButton.disabled = false;
+            resendButton.textContent = 'Renvoyer le code';
+            clearInterval(timer);
+        }
+        countdown--;
+    }
+
+    function startTimer() {
+        resendButton.disabled = true;
+        countdown = delayTimes[currentDelayIndex];
+        currentDelayIndex = Math.min(currentDelayIndex + 1, delayTimes.length - 1);
+        timer = setInterval(updateCountdown, 1000);
+    }
+
+    resendButton.addEventListener('click', function() {
+        if (!resendButton.disabled) {
+            fetch("{% url 'resend_verification_code' user_id=user_id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Le code de vérification a été renvoyé à votre email.');
+                    startTimer();
+                } else {
+                    alert('Une erreur est survenue. Veuillez réessayer.');
+                }
+            });
+        }
+    });
+
+    startTimer();  // Initialize countdown when the page loads
+});
+</script>
+{% endblock %}

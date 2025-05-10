@@ -1,0 +1,1893 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Dashboard Entreprise - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white p-6 transition-colors duration-300">
+    <!-- Header avec logo et boutons d'action -->
+    <header class="flex flex-col md:flex-row justify-between items-center mb-8">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+            {% if entreprise.logo %}
+            <img src="{{ entreprise.logo.url }}" alt="{{ entreprise.nom }}" class="w-16 h-16 rounded-full object-cover shadow-xl border-2 border-white dark:border-gray-700">
+            {% endif %}
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600">
+                {{ entreprise.nom }}
+            </h1>
+        </div>
+        
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'entreprise_public_view' entreprise.id %}" 
+               class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                </svg>
+                Voir ma page publique
+            </a>
+            
+            <button onclick="generateQR()"
+                    class="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clip-rule="evenodd" />
+                    <path d="M11 4a1 1 0 10-2 0v1a1 1 0 002 0V4zM10 7a1 1 0 011 1v1h2a1 1 0 110 2h-3a1 1 0 01-1-1V8a1 1 0 011-1zM16 9a1 1 0 100 2 1 1 0 000-2zM9 13a1 1 0 011-1h1a1 1 0 110 2v2a1 1 0 11-2 0v-3zM7 11a1 1 0 100-2H4a1 1 0 100 2h3zM17 13a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM16 17a1 1 0 100-2h-3a1 1 0 100 2h3z" />
+                </svg>
+                Générer QR Code
+            </button>
+
+            <button onclick="showTrafficAnalytics()"
+                    class="flex items-center px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Analyse du trafic
+            </button>
+        </div>
+    </header>
+
+    <!-- Conteneur principal -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Section Informations de l'entreprise -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 h-full transform transition-all hover:scale-[1.01]">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600">
+                        Informations Entreprise
+                    </h2>
+                    <button onclick="toggleEditMode()" class="text-gray-500 hover:text-orange-500 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="entreprise-form" method="post" enctype="multipart/form-data" class="hidden">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        {% for field in form %}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="mt-6 w-full bg-gradient-to-r from-orange-500 to-purple-600 text-white py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:from-orange-600 hover:to-purple-700">
+                        Enregistrer les modifications
+                    </button>
+                </form>
+
+                <div id="entreprise-info" class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <p class="text-gray-700 dark:text-gray-300">{{ entreprise.contact }}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-gray-700 dark:text-gray-300">{{ entreprise.email }}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <p class="text-gray-700 dark:text-gray-300">{{ entreprise.localisation }}</p>
+                    </div>
+                    
+                    <!-- Carte de localisation alternative à Google Maps -->
+                    <div class="mt-6 rounded-xl overflow-hidden h-48 bg-gray-200 dark:bg-gray-700 relative">
+                        <div id="map" class="h-full w-full flex items-center justify-center">
+                            <div class="text-center p-4">
+                                <div id="openstreetmap" style="height: 100%; width: 100%;"></div>
+                                <p class="text-gray-600 dark:text-gray-400 mt-2">Localisation interactive (OpenStreetMap)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widget Planification des promotions -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+                <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600 mb-4">
+                    Planifier une promotion
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <h3 class="font-medium">Promotions planifiées</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ promotions_planifiees.count }} en attente</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showScheduleModal()" class="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Planifier une nouvelle promotion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Widget Partage rapide -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+                <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600 mb-4">
+                    Partage rapide
+                </h2>
+                <div class="space-y-3">
+                    <button onclick="shareOnSocial('facebook')" class="w-full flex items-center justify-between px-4 py-2 bg-blue-600 text-white rounded-lg">
+                        <span>Partager sur Facebook</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                    <button onclick="shareOnSocial('twitter')" class="w-full flex items-center justify-between px-4 py-2 bg-blue-400 text-white rounded-lg">
+                        <span>Partager sur Twitter</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                        </svg>
+                    </button>
+                    <button onclick="shareOnSocial('whatsapp')" class="w-full flex items-center justify-between px-4 py-2 bg-green-500 text-white rounded-lg">
+                        <span>Partager sur WhatsApp</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.617c-.545 0-1.06-.113-1.534-.338l-.096-.045-1.004.26.273-1.004-.06-.095a3.637 3.637 0 01-.9-2.38c0-2.02 1.656-3.663 3.694-3.663a3.65 3.65 0 013.694 3.663c0 2.023-1.656 3.662-3.694 3.662" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                    <button onclick="copyPageLink()" class="w-full flex items-center justify-between px-4 py-2 bg-gray-700 text-white rounded-lg">
+                        <span>Copier le lien</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Widget Statistiques rapides -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+                <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600 mb-4">
+                    Statistiques rapides
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Performance</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Score global</p>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+                            {% if performance_score %}{{ performance_score|floatformat:1 }}/10{% else %}N/A{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 rounded-full bg-green-100 dark:bg-green-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Engagement</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Temps moyen</p>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-teal-600">
+                            {% if avg_engagement_time %}{{ avg_engagement_time }}s{% else %}N/A{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 rounded-full bg-purple-100 dark:bg-purple-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600 dark:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Dernière activité</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Visite récente</p>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-600">
+                            {% if last_activity %}{{ last_activity|naturaltime }}{% else %}Jamais{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section principale -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Section Promotions -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600">
+                        Gestion des Promotions
+                    </h2>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{% url 'ajouter_promotion' %}" class="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                            Ajouter une promotion
+                        </a>
+                        <button onclick="showBulkActions()" class="flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            Actions groupées
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistiques avancées -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 p-4 rounded-xl shadow hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-orange-800 dark:text-orange-200">Promotions actives</p>
+                                <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-300">{{ produits_actifs.count }}</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-orange-100 dark:bg-orange-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 dark:text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 p-4 rounded-xl shadow hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-purple-800 dark:text-purple-200">Promotions expirées</p>
+                                <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-300">{{ produits_expires.count }}</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 p-4 rounded-xl shadow hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-blue-800 dark:text-blue-200">Moyenne réduction</p>
+                                <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-300">
+                                    {% if moyenne_reduction %}{{ moyenne_reduction|floatformat:2 }}%{% else %}0%{% endif %}
+                                </h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 p-4 rounded-xl shadow hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-green-800 dark:text-green-200">Vues totales</p>
+                                <h3 class="text-2xl font-bold text-green-600 dark:text-green-300">
+                                    {{ total_views|default:"0"|intcomma }}
+                                </h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtres et recherche -->
+                <div class="mb-6 bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recherche</label>
+                            <input type="text" id="search" placeholder="Rechercher un produit..." class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        </div>
+                        <div class="min-w-[180px]">
+                            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie</label>
+                            <select id="category" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">Toutes</option>
+                                {% for categorie in categories %}
+                                <option value="{{ categorie.id }}">{{ categorie.nom }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="min-w-[180px]">
+                            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
+                            <select id="status" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">Tous</option>
+                                <option value="active">Actives</option>
+                                <option value="expired">Expirées</option>
+                                <option value="scheduled">Planifiées</option>
+                            </select>
+                        </div>
+                        <button onclick="applyFilters()" class="self-end px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg">
+                            Appliquer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Liste des promotions avec fonctionnalités avancées -->
+                <div class="overflow-x-auto rounded-xl shadow-inner">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    <input type="checkbox" id="select-all" class="rounded text-orange-500 focus:ring-orange-500">
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Produit</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prix/Promo</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Dates</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Statut</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Vues</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for produit in produits %}
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-category="{{ produit.categorie.id }}" data-status="{% if produit.est_expire %}expired{% else %}active{% endif %}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="checkbox" class="product-checkbox rounded text-orange-500 focus:ring-orange-500" value="{{ produit.id }}">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 relative group">
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onclick="showProductQR('{{ produit.id }}')" class="text-white p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ produit.nom }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ produit.categorie.nom }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white">
+                                        <span class="line-through text-gray-500 dark:text-gray-400 mr-2">{{ produit.prix }} FCFA</span>
+                                        <span class="font-bold text-red-500">{{ produit.prix_promotionnel }} FCFA</span>
+                                    </div>
+                                    <div class="text-xs text-green-600">{{ produit.discount_percentage }}% de réduction</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            {{ produit.date_debut_promo|date:"d/m/Y" }}
+                                        </div>
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            {{ produit.date_fin_promo|date:"d/m/Y" }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if produit.est_expire %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        Expirée
+                                    </span>
+                                    {% else %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        Active
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <span class="text-sm">{{ produit.views|default:"0" }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-3">
+                                        <button onclick="shareProduct('{{ produit.id }}')" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" title="Partager">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                            </svg>
+                                        </button>
+                                        <a href="{% url 'modifier_promotion' produit.id %}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300" title="Modifier">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </a>
+                                        <a href="{% url 'supprimer_promotion' produit.id %}" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" title="Supprimer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
+                    <div class="mb-4 sm:mb-0">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Affichage de <span class="font-medium">{{ produits.start_index }}</span> à <span class="font-medium">{{ produits.end_index }}</span> sur <span class="font-medium">{{ produits.paginator.count }}</span> promotions
+                        </p>
+                    </div>
+                    <div class="flex space-x-2">
+                        {% if produits.has_previous %}
+                        <a href="?page=1" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">&laquo; Première</a>
+                        <a href="?page={{ produits.previous_page_number }}" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Précédent</a>
+                        {% endif %}
+                        
+                        <span class="px-3 py-1 bg-orange-500 text-white rounded-lg">{{ produits.number }}</span>
+                        
+                        {% if produits.has_next %}
+                        <a href="?page={{ produits.next_page_number }}" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Suivant</a>
+                        <a href="?page={{ produits.paginator.num_pages }}" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Dernière &raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Analyse du trafic -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600">
+                        Analyse du trafic
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <select id="analytics-period" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm">
+                            <option value="7">7 derniers jours</option>
+                            <option value="30" selected>30 derniers jours</option>
+                            <option value="90">3 derniers mois</option>
+                            <option value="365">1 an</option>
+                        </select>
+                        <button onclick="refreshAnalytics()" class="p-1 text-gray-500 hover:text-orange-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                        <h3 class="text-lg font-medium mb-3">Vues par jour</h3>
+                        <div class="h-64">
+                            <canvas id="viewsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                        <h3 class="text-lg font-medium mb-3">Top produits</h3>
+                        <div class="h-64">
+                            <canvas id="topProductsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                    <h3 class="text-lg font-medium mb-3">Détails des vues</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Produit</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Vues</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Source</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                                {% for vue in recent_views %}
+                                <tr>
+                                    <td class="px-4 py-2 text-sm">{{ vue.date|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-4 py-2 text-sm">{{ vue.produit.nom|truncatechars:30 }}</td>
+                                    <td class="px-4 py-2 text-sm">{{ vue.count }}</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <span class="inline-flex items-center">
+                                            {% if vue.source == 'direct' %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Direct
+                                            {% elif vue.source == 'qr' %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                            </svg>
+                                            QR Code
+                                            {% else %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                            </svg>
+                                            {{ vue.source|default:"Autre" }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">Aucune donnée de vue disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Abonnés et Notifications -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-purple-600">
+                        Abonnés et Notifications
+                    </h2>
+                    <button onclick="showSubscriberModal()" class="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        Ajouter un abonné
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                        <h3 class="text-lg font-medium mb-3">Abonnés par canal</h3>
+                        <div class="h-64">
+                            <canvas id="subscribersChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                        <h3 class="text-lg font-medium mb-3">Taux d'ouverture</h3>
+                        <div class="h-64">
+                            <canvas id="openRateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                    <h3 class="text-lg font-medium mb-3">Liste des abonnés</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Email/Téléphone</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Canal</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date d'inscription</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Statut</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                                {% for subscriber in subscribers %}
+                                <tr>
+                                    <td class="px-4 py-2 text-sm">{{ subscriber.email_or_phone }}</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <span class="inline-flex items-center">
+                                            {% if subscriber.channel == 'email' %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            Email
+                                            {% else %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            </svg>
+                                            SMS
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">{{ subscriber.subscribed_at|date:"d/m/Y" }}</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        {% if subscriber.is_active %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                            Actif
+                                        </span>
+                                        {% else %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+                                            Inactif
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex space-x-2">
+                                            <button onclick="sendNotification('{{ subscriber.id }}')" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" title="Notifier">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                                </svg>
+                                            </button>
+                                            <button onclick="editSubscriber('{{ subscriber.id }}')" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300" title="Modifier">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                            <button onclick="deleteSubscriber('{{ subscriber.id }}')" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" title="Supprimer">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">Aucun abonné enregistré</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal Entreprise -->
+<div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeQRModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-4">QR Code de votre entreprise</h2>
+        
+        <div class="flex justify-center mb-6">
+            <div id="qr-code-container" class="p-4 bg-white rounded-lg shadow-inner relative">
+                <canvas id="qr-code" class="w-64 h-64"></canvas>
+                {% if entreprise.logo %}
+                <img src="{{ entreprise.logo.url }}" alt="{{ entreprise.nom }}" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-4 border-white">
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label for="qr-custom-text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texte personnalisé</label>
+            <input type="text" id="qr-custom-text" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="Scannez-moi pour voir nos promotions!" value="Scannez-moi pour voir les produits disponibles chez {{ entreprise.nom }}">
+        </div>
+        
+        <div class="flex justify-center space-x-4">
+            <button onclick="downloadQR('png')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Télécharger PNG
+            </button>
+            <button onclick="downloadQR('pdf')" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Télécharger PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal Produit -->
+<div id="product-qr-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeProductQRModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-4">QR Code du produit</h2>
+        
+        <div class="flex justify-center mb-6">
+            <div id="product-qr-code-container" class="p-4 bg-white rounded-lg shadow-inner relative">
+                <canvas id="product-qr-code" class="w-64 h-64"></canvas>
+                <img id="product-qr-image" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-4 border-white" src="" alt="">
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label for="product-qr-custom-text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texte personnalisé</label>
+            <input type="text" id="product-qr-custom-text" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="Découvrez cette promotion exclusive!">
+        </div>
+        
+        <div class="flex justify-center space-x-4">
+            <button onclick="downloadProductQR('png')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Télécharger PNG
+            </button>
+            <button onclick="downloadProductQR('pdf')" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Télécharger PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Planification -->
+<div id="schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-2xl relative">
+        <button onclick="closeScheduleModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Planifier une nouvelle promotion</h2>
+        
+        <form id="schedule-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="schedule-product" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Produit</label>
+                    <select id="schedule-product" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                        <option value="">Sélectionner un produit</option>
+                        {% for produit in all_products %}
+                        <option value="{{ produit.id }}">{{ produit.nom }} ({{ produit.prix }} FCFA)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="schedule-discount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Réduction (%)</label>
+                    <input type="number" id="schedule-discount" min="1" max="99" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="schedule-start" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de début</label>
+                    <input type="datetime-local" id="schedule-start" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                </div>
+                <div>
+                    <label for="schedule-end" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de fin</label>
+                    <input type="datetime-local" id="schedule-end" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                </div>
+            </div>
+            
+            <div>
+                <label for="schedule-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes (optionnel)</label>
+                <textarea id="schedule-notes" rows="3" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg"></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                    Annuler
+                </button>
+                <button type="button" onclick="submitSchedule()" class="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-lg">
+                    Planifier
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Actions groupées -->
+<div id="bulk-actions-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeBulkActionsModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Actions groupées</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Action à effectuer</label>
+                <select id="bulk-action" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                    <option value="">Sélectionner une action</option>
+                    <option value="activate">Activer les promotions</option>
+                    <option value="deactivate">Désactiver les promotions</option>
+                    <option value="delete">Supprimer les promotions</option>
+                    <option value="export">Exporter en CSV</option>
+                    <option value="qr">Générer des QR Codes</option>
+                </select>
+            </div>
+            
+            <div id="bulk-action-details" class="hidden">
+                <div id="activate-details" class="action-detail hidden p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Les promotions sélectionnées seront immédiatement activées et visibles par les clients.</p>
+                </div>
+                <div id="deactivate-details" class="action-detail hidden p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Les promotions sélectionnées seront désactivées et ne seront plus visibles par les clients.</p>
+                </div>
+                <div id="delete-details" class="action-detail hidden p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Les promotions sélectionnées seront définitivement supprimées. Cette action est irréversible.</p>
+                    <div class="mt-2 flex items-center">
+                        <input type="checkbox" id="confirm-delete" class="rounded text-red-500 focus:ring-red-500">
+                        <label for="confirm-delete" class="ml-2 text-sm text-red-600 dark:text-red-400">Je confirme la suppression</label>
+                    </div>
+                </div>
+                <div id="export-details" class="action-detail hidden p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Les données des promotions sélectionnées seront exportées au format CSV.</p>
+                </div>
+                <div id="qr-details" class="action-detail hidden p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Des QR Codes individuels seront générés pour chaque promotion sélectionnée.</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeBulkActionsModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                    Annuler
+                </button>
+                <button type="button" onclick="submitBulkAction()" class="px-4 py-2 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white rounded-lg">
+                    Appliquer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Analyse du trafic -->
+<div id="traffic-analytics-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-4xl relative">
+        <button onclick="closeTrafficAnalytics()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Analyse détaillée du trafic</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 p-4 rounded-xl shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-blue-800 dark:text-blue-200">Vues totales</p>
+                        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ total_views|default:"0"|intcomma }}</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 p-4 rounded-xl shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-purple-800 dark:text-purple-200">Vues via QR Code</p>
+                        <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-300">{{ qr_views|default:"0"|intcomma }}</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 p-4 rounded-xl shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-green-800 dark:text-green-200">Taux de conversion</p>
+                        <h3 class="text-2xl font-bold text-green-600 dark:text-green-300">
+                            {% if conversion_rate %}{{ conversion_rate|floatformat:2 }}%{% else %}0%{% endif %}
+                        </h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                <h3 class="text-lg font-medium mb-3">Sources du trafic</h3>
+                <div class="h-64">
+                    <canvas id="trafficSourcesChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                <h3 class="text-lg font-medium mb-3">Activité horaire</h3>
+                <div class="h-64">
+                    <canvas id="hourlyActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+            <h3 class="text-lg font-medium mb-3">Détails par appareil</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Type d'appareil</h4>
+                    <canvas id="deviceTypeChart" height="200"></canvas>
+                </div>
+                <div>
+                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Système d'exploitation</h4>
+                    <canvas id="osChart" height="200"></canvas>
+                </div>
+                <div>
+                    <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Navigateur</h4>
+                    <canvas id="browserChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Abonnés -->
+<div id="subscriber-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeSubscriberModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6" id="subscriber-modal-title">Ajouter un abonné</h2>
+        
+        <form id="subscriber-form" class="space-y-4">
+            <input type="hidden" id="subscriber-id">
+            <div>
+                <label for="subscriber-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email ou Téléphone</label>
+                <input type="text" id="subscriber-email" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+            </div>
+            
+            <div>
+                <label for="subscriber-channel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Canal de notification</label>
+                <select id="subscriber-channel" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                </select>
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" id="subscriber-active" class="rounded text-orange-500 focus:ring-orange-500">
+                <label for="subscriber-active" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Abonné actif</label>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeSubscriberModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                    Annuler
+                </button>
+                <button type="button" onclick="submitSubscriber()" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Notification -->
+<div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeNotificationModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Envoyer une notification</h2>
+        
+        <form id="notification-form" class="space-y-4">
+            <input type="hidden" id="notification-subscriber-id">
+            
+            <div>
+                <label for="notification-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de notification</label>
+                <select id="notification-type" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                    <option value="promotion">Promotion</option>
+                    <option value="newsletter">Newsletter</option>
+                    <option value="alerte">Alerte</option>
+                    <option value="personnalise">Personnalisée</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="notification-message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
+                <textarea id="notification-message" rows="4" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg"></textarea>
+            </div>
+            
+            <div>
+                <label for="notification-promotion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Promotion associée (optionnel)</label>
+                <select id="notification-promotion" class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                    <option value="">Aucune</option>
+                    {% for produit in produits_actifs %}
+                    <option value="{{ produit.id }}">{{ produit.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeNotificationModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                    Annuler
+                </button>
+                <button type="button" onclick="submitNotification()" class="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white rounded-lg">
+                    Envoyer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Include libraries -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+<script>
+    // Initialisation des variables globales
+    let map;
+    let viewsChart, topProductsChart, trafficSourcesChart, hourlyActivityChart, deviceTypeChart, osChart, browserChart;
+    let subscribersChart, openRateChart;
+    
+    // Fonctions pour les modals
+    function showTrafficAnalytics() {
+        document.getElementById('traffic-analytics-modal').classList.remove('hidden');
+        initTrafficCharts();
+    }
+    
+    function closeTrafficAnalytics() {
+        document.getElementById('traffic-analytics-modal').classList.add('hidden');
+    }
+    
+    function showScheduleModal() {
+        document.getElementById('schedule-modal').classList.remove('hidden');
+    }
+    
+    function closeScheduleModal() {
+        document.getElementById('schedule-modal').classList.add('hidden');
+    }
+    
+    function showBulkActions() {
+        const selectedCount = document.querySelectorAll('.product-checkbox:checked').length;
+        if (selectedCount === 0) {
+            alert('Veuillez sélectionner au moins un produit');
+            return;
+        }
+        document.getElementById('bulk-actions-modal').classList.remove('hidden');
+    }
+    
+    function closeBulkActionsModal() {
+        document.getElementById('bulk-actions-modal').classList.add('hidden');
+    }
+    
+    function showSubscriberModal(subscriberId = null) {
+        const modal = document.getElementById('subscriber-modal');
+        const title = document.getElementById('subscriber-modal-title');
+        const form = document.getElementById('subscriber-form');
+        
+        if (subscriberId) {
+            title.textContent = 'Modifier un abonné';
+            document.getElementById('subscriber-id').value = subscriberId;
+            // Ici, vous devriez charger les données de l'abonné via AJAX
+            // Pour l'exemple, nous simulons des données
+            document.getElementById('subscriber-email').value = 'abonne@example.com';
+            document.getElementById('subscriber-channel').value = 'email';
+            document.getElementById('subscriber-active').checked = true;
+        } else {
+            title.textContent = 'Ajouter un abonné';
+            form.reset();
+        }
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closeSubscriberModal() {
+        document.getElementById('subscriber-modal').classList.add('hidden');
+    }
+    
+    function showNotificationModal(subscriberId) {
+        document.getElementById('notification-subscriber-id').value = subscriberId;
+        document.getElementById('notification-modal').classList.remove('hidden');
+    }
+    
+    function closeNotificationModal() {
+        document.getElementById('notification-modal').classList.add('hidden');
+    }
+    
+    // Gestion des actions groupées
+    document.getElementById('bulk-action').addEventListener('change', function() {
+        document.querySelectorAll('.action-detail').forEach(el => el.classList.add('hidden'));
+        if (this.value) {
+            document.getElementById('bulk-action-details').classList.remove('hidden');
+            document.getElementById(`${this.value}-details`).classList.remove('hidden');
+        } else {
+            document.getElementById('bulk-action-details').classList.add('hidden');
+        }
+    });
+    
+    function submitBulkAction() {
+        const action = document.getElementById('bulk-action').value;
+        if (!action) {
+            alert('Veuillez sélectionner une action');
+            return;
+        }
+        
+        if (action === 'delete' && !document.getElementById('confirm-delete').checked) {
+            alert('Veuillez confirmer la suppression');
+            return;
+        }
+        
+        const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(el => el.value);
+        
+        // Ici, vous enverriez normalement une requête AJAX au serveur
+        console.log(`Action: ${action}, IDs: ${selectedIds.join(',')}`);
+        alert(`Action "${action}" sera appliquée à ${selectedIds.length} produit(s)`);
+        
+        closeBulkActionsModal();
+    }
+    
+    // Planification des promotions
+    function submitSchedule() {
+        const productId = document.getElementById('schedule-product').value;
+        const discount = document.getElementById('schedule-discount').value;
+        const startDate = document.getElementById('schedule-start').value;
+        const endDate = document.getElementById('schedule-end').value;
+        
+        if (!productId || !discount || !startDate || !endDate) {
+            alert('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+        
+        // Ici, vous enverriez normalement une requête AJAX au serveur
+        console.log(`Planification: Produit ${productId}, Réduction ${discount}%, Du ${startDate} au ${endDate}`);
+        alert('Promotion planifiée avec succès!');
+        
+        closeScheduleModal();
+    }
+    
+    // Gestion des abonnés
+    function submitSubscriber() {
+        const subscriberId = document.getElementById('subscriber-id').value;
+        const email = document.getElementById('subscriber-email').value;
+        const channel = document.getElementById('subscriber-channel').value;
+        const isActive = document.getElementById('subscriber-active').checked;
+        
+        if (!email) {
+            alert('Veuillez entrer un email ou un numéro de téléphone');
+            return;
+        }
+        
+        // Ici, vous enverriez normalement une requête AJAX au serveur
+        console.log(`Abonné: ${email}, Canal: ${channel}, Actif: ${isActive}`);
+        alert(subscriberId ? 'Abonné modifié avec succès!' : 'Abonné ajouté avec succès!');
+        
+        closeSubscriberModal();
+    }
+    
+    function editSubscriber(subscriberId) {
+        showSubscriberModal(subscriberId);
+    }
+    
+    function deleteSubscriber(subscriberId) {
+        if (confirm('Voulez-vous vraiment supprimer cet abonné ?')) {
+            // Ici, vous enverriez normalement une requête AJAX au serveur
+            console.log(`Suppression abonné ID: ${subscriberId}`);
+            alert('Abonné supprimé avec succès!');
+        }
+    }
+    
+    function sendNotification(subscriberId) {
+        showNotificationModal(subscriberId);
+    }
+    
+    function submitNotification() {
+        const subscriberId = document.getElementById('notification-subscriber-id').value;
+        const type = document.getElementById
+    // Initialisation des variables globales
+    let map;
+    let viewsChart, topProductsChart, trafficSourcesChart, hourlyActivityChart, deviceTypeChart, osChart, browserChart;
+    
+    // Fonctions pour les modals
+    function showTrafficAnalytics() {
+        document.getElementById('traffic-analytics-modal').classList.remove('hidden');
+        initTrafficCharts();
+    }
+    
+    function closeTrafficAnalytics() {
+        document.getElementById('traffic-analytics-modal').classList.add('hidden');
+    }
+    
+    function showScheduleModal() {
+        document.getElementById('schedule-modal').classList.remove('hidden');
+    }
+    
+    function closeScheduleModal() {
+        document.getElementById('schedule-modal').classList.add('hidden');
+    }
+    
+    function showBulkActions() {
+        const selectedCount = document.querySelectorAll('.product-checkbox:checked').length;
+        if (selectedCount === 0) {
+            alert('Veuillez sélectionner au moins un produit');
+            return;
+        }
+        document.getElementById('bulk-actions-modal').classList.remove('hidden');
+    }
+    
+    function closeBulkActionsModal() {
+        document.getElementById('bulk-actions-modal').classList.add('hidden');
+    }
+    
+    // Gestion des actions groupées
+    document.getElementById('bulk-action').addEventListener('change', function() {
+        document.querySelectorAll('.action-detail').forEach(el => el.classList.add('hidden'));
+        if (this.value) {
+            document.getElementById('bulk-action-details').classList.remove('hidden');
+            document.getElementById(`${this.value}-details`).classList.remove('hidden');
+        } else {
+            document.getElementById('bulk-action-details').classList.add('hidden');
+        }
+    });
+    
+    function submitBulkAction() {
+        const action = document.getElementById('bulk-action').value;
+        if (!action) {
+            alert('Veuillez sélectionner une action');
+            return;
+        }
+        
+        if (action === 'delete' && !document.getElementById('confirm-delete').checked) {
+            alert('Veuillez confirmer la suppression');
+            return;
+        }
+        
+        const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(el => el.value);
+        
+        // Ici, vous enverriez normalement une requête AJAX au serveur
+        console.log(`Action: ${action}, IDs: ${selectedIds.join(',')}`);
+        alert(`Action "${action}" sera appliquée à ${selectedIds.length} produit(s)`);
+        
+        closeBulkActionsModal();
+    }
+    
+    // Planification des promotions
+    function submitSchedule() {
+        const productId = document.getElementById('schedule-product').value;
+        const discount = document.getElementById('schedule-discount').value;
+        const startDate = document.getElementById('schedule-start').value;
+        const endDate = document.getElementById('schedule-end').value;
+        
+        if (!productId || !discount || !startDate || !endDate) {
+            alert('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+        
+        // Ici, vous enverriez normalement une requête AJAX au serveur
+        console.log(`Planification: Produit ${productId}, Réduction ${discount}%, Du ${startDate} au ${endDate}`);
+        alert('Promotion planifiée avec succès!');
+        
+        closeScheduleModal();
+    }
+    
+    // Partage sur les réseaux sociaux
+    function shareOnSocial(platform) {
+        const url = encodeURIComponent(window.location.origin + "{% url 'entreprise_public_view' entreprise.id %}");
+        const text = encodeURIComponent("Découvrez les promotions exclusives de {{ entreprise.nom }}!");
+        
+        let shareUrl;
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${text} ${url}`;
+                break;
+            default:
+                return;
+        }
+        
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+    
+    function copyPageLink() {
+        const url = window.location.origin + "{% url 'entreprise_public_view' entreprise.id %}";
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Lien copié dans le presse-papiers!');
+        });
+    }
+    
+    // Gestion des QR Codes
+    function generateQR() {
+        const qrModal = document.getElementById('qr-modal');
+        qrModal.classList.remove('hidden');
+        
+        const url = window.location.origin + "{% url 'entreprise_public_view' entreprise.id %}";
+        const qrCode = document.getElementById('qr-code');
+        
+        QRCode.toCanvas(qrCode, url, {
+            width: 256,
+            margin: 2,
+            color: {
+                dark: '#000000',
+                light: '#ffffff'
+            }
+        }, function(error) {
+            if (error) console.error(error);
+        });
+    }
+    
+    function showProductQR(productId) {
+        const product = {% for p in produits %}{% if forloop.first %}{{ p.id }}{% endif %}{% endfor %}; // Simplifié pour l'exemple
+        const productImage = "{% if produits.0.image %}{{ produits.0.image.url }}{% endif %}"; // Simplifié pour l'exemple
+        
+        document.getElementById('product-qr-image').src = productImage;
+        document.getElementById('product-qr-modal').classList.remove('hidden');
+        
+        const url = window.location.origin + `/product/${productId}`; // URL à adapter
+        const qrCode = document.getElementById('product-qr-code');
+        
+        QRCode.toCanvas(qrCode, url, {
+            width: 256,
+            margin: 2,
+            color: {
+                dark: '#000000',
+                light: '#ffffff'
+            }
+        }, function(error) {
+            if (error) console.error(error);
+        });
+    }
+    
+    function closeProductQRModal() {
+        document.getElementById('product-qr-modal').classList.add('hidden');
+    }
+    
+    function downloadQR(format) {
+        const container = document.getElementById('qr-code-container');
+        const customText = document.getElementById('qr-custom-text').value || "{{ entreprise.nom }}";
+        const entrepriseName = "{{ entreprise.nom|slugify }}";
+        
+        html2canvas(container).then(canvas => {
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = `qr-code-${entrepriseName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } else if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm'
+                });
+                
+                // Ajout du QR Code
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+                
+                // Ajout du texte personnalisé
+                pdf.setFontSize(12);
+                pdf.text(customText, 10, pdfHeight + 20);
+                
+                pdf.save(`qr-code-${entrepriseName}.pdf`);
+            }
+        });
+    }
+    
+    function downloadProductQR(format) {
+        const container = document.getElementById('product-qr-code-container');
+        const customText = document.getElementById('product-qr-custom-text').value || "Promotion exclusive";
+        const productName = "produit"; // À remplacer par le nom réel du produit
+        
+        html2canvas(container).then(canvas => {
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = `qr-code-${productName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } else if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm'
+                });
+                
+                // Ajout du QR Code
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+                
+                // Ajout du texte personnalisé
+                pdf.setFontSize(12);
+                pdf.text(customText, 10, pdfHeight + 20);
+                
+                pdf.save(`qr-code-${productName}.pdf`);
+            }
+        });
+    }
+    
+    // Initialisation des graphiques
+    function initCharts() {
+        // Graphique des vues par jour
+        const viewsCtx = document.getElementById('viewsChart').getContext('2d');
+        viewsChart = new Chart(viewsCtx, {
+            type: 'line',
+            data: {
+                labels: {{ views_labels|safe }},
+                datasets: [{
+                    label: 'Vues par jour',
+                    data: {{ views_data|safe }},
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique des top produits
+        const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+        topProductsChart = new Chart(topProductsCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ top_products_labels|safe }},
+                datasets: [{
+                    label: 'Vues',
+                    data: {{ top_products_data|safe }},
+                    backgroundColor: [
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(244, 63, 94, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(244, 63, 94, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                indexAxis: 'y',
+            }
+        });
+    }
+    
+    function initTrafficCharts() {
+        // Graphique des sources de trafic
+        const trafficSourcesCtx = document.getElementById('trafficSourcesChart').getContext('2d');
+        trafficSourcesChart = new Chart(trafficSourcesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['QR Code', 'Direct', 'Réseaux sociaux', 'Email', 'Autre'],
+                datasets: [{
+                    data: [45, 25, 15, 10, 5],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(156, 163, 175, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(156, 163, 175, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+        
+        // Graphique de l'activité horaire
+        const hourlyActivityCtx = document.getElementById('hourlyActivityChart').getContext('2d');
+        hourlyActivityChart = new Chart(hourlyActivityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['00h', '02h', '04h', '06h', '08h', '10h', '12h', '14h', '16h', '18h', '20h', '22h'],
+                datasets: [{
+                    label: 'Vues par heure',
+                    data: [5, 3, 2, 8, 15, 25, 32, 40, 38, 45, 30, 15],
+                    backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                    borderColor: 'rgba(139, 92, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Graphique du type d'appareil
+        const deviceTypeCtx = document.getElementById('deviceTypeChart').getContext('2d');
+        deviceTypeChart = new Chart(deviceTypeCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Mobile', 'Desktop', 'Tablette'],
+                datasets: [{
+                    data: [65, 30, 5],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+        
+        // Graphique du système d'exploitation
+        const osCtx = document.getElementById('osChart').getContext('2d');
+        osChart = new Chart(osCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Android', 'iOS', 'Windows', 'MacOS', 'Linux'],
+                datasets: [{
+                    data: [45, 25, 20, 8, 2],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(156, 163, 175, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(139, 92, 246, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(156, 163, 175, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(139, 92, 246, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+        
+        // Graphique du navigateur
+        const browserCtx = document.getElementById('browserChart').getContext('2d');
+        browserChart = new Chart(browserCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Chrome', 'Safari', 'Firefox', 'Edge', 'Autre'],
+                datasets: [{
+                    data: [60, 20, 10, 5, 5],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(156, 163, 175, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(156, 163, 175, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    }
+    
+    // Initialisation de la carte OpenStreetMap
+    function initMap() {
+        const latitude = {{ entreprise.latitude|default:"14.7645042" }};
+        const longitude = {{ entreprise.longitude|default:"-17.3660286" }};
+        
+        map = L.map('openstreetmap').setView([latitude, longitude], 15);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup("{{ entreprise.nom }}<br>{{ entreprise.localisation }}")
+            .openPopup();
+    }
+    
+    // Filtres des produits
+    function applyFilters() {
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        const categoryFilter = document.getElementById('category').value;
+        const statusFilter = document.getElementById('status').value;
+        
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const productName = row.querySelector('td:nth-child(2) div:nth-child(1)').textContent.toLowerCase();
+            const productCategory = row.getAttribute('data-category');
+            const productStatus = row.getAttribute('data-status');
+            
+            const matchesSearch = searchTerm === '' || productName.includes(searchTerm);
+            const matchesCategory = categoryFilter === '' || productCategory === categoryFilter;
+            const matchesStatus = statusFilter === '' || productStatus === statusFilter;
+            
+            if (matchesSearch && matchesCategory && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Gestion de la sélection multiple
+    document.getElementById('select-all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    
+    // Rafraîchir les analyses
+    function refreshAnalytics() {
+        const period = document.getElementById('analytics-period').value;
+        console.log(`Rafraîchir les données pour les ${period} derniers jours`);
+        // Ici, vous feriez normalement une requête AJAX pour obtenir les nouvelles données
+        alert(`Analyse mise à jour pour les ${period} derniers jours`);
+    }
+    
+    // Partage d'un produit
+    function shareProduct(productId) {
+        const url = window.location.origin + `/product/${productId}`; // URL à adapter
+        const text = "Découvrez cette promotion exclusive!";
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Promotion exclusive',
+                text: text,
+                url: url
+            }).catch(err => {
+                console.log('Erreur de partage:', err);
+            });
+        } else {
+            // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+            prompt("Copiez ce lien pour partager:", url);
+        }
+    }
+    
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        initCharts();
+        
+        // Animation des cartes de statistiques
+        const statsCards = document.querySelectorAll('.grid.grid-cols-1 div, .grid.grid-cols-2 div, .grid.grid-cols-3 div, .grid.grid-cols-4 div');
+        statsCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 100}ms`;
+            card.classList.add('animate-fade-in-up');
+        });
+    });
+</script>
+
+<style>
+    /* Animations */
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.5s ease-out forwards;
+    }
+
+    /* Gradient text */
+    .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Form inputs */
+    input, select, textarea {
+        @apply w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all;
+    }
+
+    /* Table styles */
+    table {
+        @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+    }
+
+    th {
+        @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+    }
+
+    td {
+        @apply px-6 py-4 whitespace-nowrap;
+    }
+
+    /* Card hover effect */
+    .hover-scale {
+        @apply transition-transform duration-300 hover:scale-[1.02];
+    }
+
+    /* Shadow effects */
+    .shadow-3xl {
+        box-shadow: 0 15px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    
+    .dark ::-webkit-scrollbar-track {
+        background: #374151;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb {
+        background: #6b7280;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+    
+    /* Tooltip styles */
+    [data-tooltip] {
+        position: relative;
+    }
+    
+    [data-tooltip]:before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s;
+    }
+    
+    [data-tooltip]:hover:before {
+        opacity: 1;
+        visibility: visible;
+        bottom: calc(100% + 5px);
+    }
+</style>
+{% endblock %}
