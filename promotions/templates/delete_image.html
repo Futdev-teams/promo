@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer image - PromoSite{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white">
+    <!-- Background subtle grid -->
+    <div class="absolute inset-0 overflow-hidden opacity-20">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-50 to-purple-50"></div>
+        <div class="absolute inset-0 bg-grid-light"></div>
+    </div>
+
+    <div class="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Floating header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center mb-4">
+                <div class="relative">
+                    <!-- Holographic circle -->
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-pink-500 opacity-10 blur-xl animate-pulse-slow"></div>
+                    <!-- Icon container -->
+                    <div class="relative flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-lg border border-gray-100">
+                        <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-pink-600">Supprimer Image</span>
+            </h1>
+            <p class="text-lg text-gray-600 max-w-lg mx-auto">
+                Êtes-vous sûr de vouloir supprimer cette image ?
+            </p>
+        </div>
+
+        <!-- Confirmation card -->
+        <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <!-- Decorative elements -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 via-pink-400 to-purple-400"></div>
+            
+            <div class="p-6 sm:p-8">
+                <div class="text-center mb-6">
+                    <div class="w-full h-48 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                        <img src="{{ image.image.url }}" alt="{{ image.description|default:'Image entreprise' }}" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                        <div class="text-center mb-8">
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ image.description|default:"Image sans description" }}</h3>
+                <p class="text-sm text-gray-500">Taille: {{ image.image.width }}x{{ image.image.height }}px</p>
+            </div>
+
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <!-- Cancel button -->
+                    <a href="{% url 'image_list' %}" class="flex-1 sm:flex-none px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors duration-200 text-center">
+                        Annuler
+                    </a>
+                    
+                    <!-- Delete button -->
+                    <button type="submit" class="flex-1 sm:flex-none px-6 py-3 border border-transparent rounded-lg font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 shadow-sm transition-colors duration-200">
+                        Confirmer la suppression
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Warning message -->
+    <div class="mt-8 p-4 bg-red-50 rounded-lg border border-red-100 text-center">
+        <p class="text-sm text-red-600">
+            <svg class="inline w-5 h-5 mr-1 -mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Attention: Cette action est irréversible. L'image sera définitivement supprimée.
+        </p>
+    </div>
+</div>
+</div><style> .bg-grid-light { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23e5e7eb'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e"); } @keyframes pulse-slow { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.15; } } .animate-pulse-slow { animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; } </style>
+{% endblock %}

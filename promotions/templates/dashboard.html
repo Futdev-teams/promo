@@ -61,8 +61,29 @@
                         </svg>
                     </button>
                 </div>
-
-                <form id="entreprise-form" method="post" enctype="multipart/form-data" class="hidden">
+                <div class="flex flex-wrap gap-3 mt-6">
+                    <button onclick="showOpeningHoursModal()" class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Horaires d'ouverture
+                    </button>
+                    
+                    <button onclick="showReviewsModal()" class="flex items-center px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        Valider les avis ({{ pending_reviews.count }})
+                    </button>
+                    
+                    <button onclick="showFAQModal()" class="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Gérer la FAQ
+                    </button>
+                </div>
+                                <form id="entreprise-form" method="post" enctype="multipart/form-data" class="hidden">
                     {% csrf_token %}
                     <div class="space-y-4">
                         {% for field in form %}
@@ -411,15 +432,14 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    {% if produit.est_expire %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                        Expirée
-                                    </span>
-                                    {% else %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                        Active
-                                    </span>
-                                    {% endif %}
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" value="" class="sr-only peer" {% if not produit.est_expire %}checked{% endif %} 
+                                            onclick="toggleProductStatus('{{ produit.id }}', {{ produit.est_expire|lower }})">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 dark:peer-focus:ring-orange-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                        <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                            {% if produit.est_expire %}Inactif{% else %}Actif{% endif %}
+                                        </span>
+                                    </label>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
@@ -1777,6 +1797,266 @@
             card.classList.add('animate-fade-in-up');
         });
     });
+
+
+
+    // Jours de la semaine pour les horaires d'ouverture
+const days_of_week = [
+    ['LUN', 'Lundi'],
+    ['MAR', 'Mardi'],
+    ['MER', 'Mercredi'],
+    ['JEU', 'Jeudi'],
+    ['VEN', 'Vendredi'],
+    ['SAM', 'Samedi'],
+    ['DIM', 'Dimanche']
+];
+
+function showOpeningHoursModal() {
+    // Charger les horaires existants via AJAX
+    fetch(`/api/entreprise/{{ entreprise.id }}/horaires/`)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(day => {
+                document.getElementById(`closed-${day.jour}`).checked = day.est_ferme;
+                document.getElementById(`open-${day.jour}`).value = day.heure_ouverture || '';
+                document.getElementById(`close-${day.jour}`).value = day.heure_fermeture || '';
+            });
+            document.getElementById('opening-hours-modal').classList.remove('hidden');
+        });
+}
+
+function closeOpeningHoursModal() {
+    document.getElementById('opening-hours-modal').classList.add('hidden');
+}
+
+function saveOpeningHours() {
+    const horaires = days_of_week.map(day => ({
+        jour: day[0],
+        est_ferme: document.getElementById(`closed-${day[0]}`).checked,
+        heure_ouverture: document.getElementById(`open-${day[0]}`).value,
+        heure_fermeture: document.getElementById(`close-${day[0]}`).value
+    }));
+
+    // Envoyer les données au serveur
+    fetch(`/api/entreprise/{{ entreprise.id }}/horaires/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(horaires)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Horaires enregistrés avec succès!');
+        closeOpeningHoursModal();
+    });
+}
+
+
+
+function showReviewsModal() {
+    document.getElementById('reviews-modal').classList.remove('hidden');
+}
+
+function closeReviewsModal() {
+    document.getElementById('reviews-modal').classList.add('hidden');
+}
+
+function approveReview(reviewId, approve) {
+    fetch(`/api/avis/${reviewId}/approve/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({approve: approve})
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(`Avis ${approve ? 'approuvé' : 'rejeté'} avec succès!`);
+        // Recharger la liste des avis
+        showReviewsModal();
+    });
+}
+
+function showFAQModal() {
+    document.getElementById('faq-modal').classList.remove('hidden');
+}
+
+function closeFAQModal() {
+    document.getElementById('faq-modal').classList.add('hidden');
+}
+
+function showAddFAQModal() {
+    document.getElementById('edit-faq-title').textContent = 'Ajouter une question';
+    document.getElementById('edit-faq-form').reset();
+    document.getElementById('faq-id').value = '';
+    document.getElementById('edit-faq-modal').classList.remove('hidden');
+}
+
+function editFAQ(faqId) {
+    // Charger les données de la FAQ via AJAX
+    fetch(`/api/faq/${faqId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('edit-faq-title').textContent = 'Modifier la question';
+            document.getElementById('faq-id').value = data.id;
+            document.getElementById('faq-question').value = data.question;
+            document.getElementById('faq-answer').value = data.reponse;
+            document.getElementById('faq-order').value = data.ordre;
+            document.getElementById('edit-faq-modal').classList.remove('hidden');
+        });
+}
+
+function closeEditFAQModal() {
+    document.getElementById('edit-faq-modal').classList.add('hidden');
+}
+
+function saveFAQ() {
+    const faqData = {
+        id: document.getElementById('faq-id').value || null,
+        question: document.getElementById('faq-question').value,
+        reponse: document.getElementById('faq-answer').value,
+        ordre: document.getElementById('faq-order').value
+    };
+
+    const method = faqData.id ? 'PUT' : 'POST';
+    const url = faqData.id ? `/api/faq/${faqData.id}/` : '/api/faq/';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(faqData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('FAQ enregistrée avec succès!');
+        closeEditFAQModal();
+        showFAQModal(); // Recharger la liste
+    });
+}
+
+function deleteFAQ(faqId) {
+    if (confirm('Voulez-vous vraiment supprimer cette question ?')) {
+        fetch(`/api/faq/${faqId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Question supprimée avec succès!');
+                showFAQModal(); // Recharger la liste
+            }
+        });
+    }
+}
+function toggleProductStatus(productId, currentStatus) {
+    const newStatus = !currentStatus;
+    
+    fetch(`/api/produits/${productId}/status/`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({est_expire: newStatus})
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(`Produit ${newStatus ? 'désactivé' : 'activé'} avec succès!`);
+        window.location.reload();
+    });
+}
+
+function initMap() {
+    const latitude = {{ entreprise.latitude|default:"14.7645042" }};
+    const longitude = {{ entreprise.longitude|default:"-17.3660286" }};
+    
+    map = L.map('openstreetmap').setView([latitude, longitude], 15);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    const marker = L.marker([latitude, longitude], {
+        draggable: true
+    }).addTo(map)
+      .bindPopup("{{ entreprise.nom }}<br>{{ entreprise.localisation }}")
+      .openPopup();
+    
+    // Mise à jour des coordonnées quand on déplace le marqueur
+    marker.on('dragend', function(e) {
+        const newPos = marker.getLatLng();
+        document.getElementById('id_latitude').value = newPos.lat;
+        document.getElementById('id_longitude').value = newPos.lng;
+    });
+    
+    // Ajout d'un contrôle de recherche
+    const searchControl = new L.Control.Search({
+        position: 'topright',
+        layer: L.layerGroup([marker]),
+        propertyName: 'name',
+        marker: false,
+        moveToLocation: function(latlng, title, map) {
+            map.setView(latlng, 16);
+        }
+    });
+    
+    searchControl.on('search:locationfound', function(e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById('id_latitude').value = e.latlng.lat;
+        document.getElementById('id_longitude').value = e.latlng.lng;
+    }).on('search:collapsed', function(e) {
+        // Recentrer sur le marqueur après la recherche
+        map.setView(marker.getLatLng(), 15);
+    });
+    
+    map.addControl(searchControl);
+    
+    // Ajout d'un bouton pour localiser l'utilisateur
+    const locateControl = L.control.locate({
+        position: 'topright',
+        drawCircle: true,
+        follow: true,
+        setView: 'untilPanOrZoom',
+        keepCurrentZoomLevel: true,
+        markerStyle: {
+            weight: 1,
+            opacity: 0.8,
+            fillOpacity: 0.8
+        },
+        circleStyle: {
+            weight: 1,
+            clickable: false
+        },
+        icon: 'fa fa-map-marker',
+        metric: true,
+        strings: {
+            title: "Ma position",
+            popup: "Vous êtes à {distance} {unit} de ce point",
+            outsideMapBoundsMsg: "Vous semblez être hors des limites de la carte"
+        },
+        locateOptions: {
+            maxZoom: 15,
+            watch: true,
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 10000
+        }
+    }).addTo(map);
+}
+
+
+
+
+
+
 </script>
 
 <style>
@@ -1890,4 +2170,204 @@
         bottom: calc(100% + 5px);
     }
 </style>
+<!-- Modal Jours d'ouverture -->
+<div id="opening-hours-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-2xl relative">
+        <button onclick="closeOpeningHoursModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Gestion des horaires d'ouverture</h2>
+        
+        <form id="opening-hours-form" class="space-y-4">
+            <div class="overflow-y-auto max-h-96">
+                {% for day in days_of_week %}
+                <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-medium">{{ day.1 }}</h3>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="closed-{{ day.0 }}" class="rounded text-orange-500 focus:ring-orange-500">
+                            <label for="closed-{{ day.0 }}" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Fermé ce jour</label>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="open-{{ day.0 }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heure d'ouverture</label>
+                            <input type="time" id="open-{{ day.0 }}" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="close-{{ day.0 }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heure de fermeture</label>
+                            <input type="time" id="close-{{ day.0 }}" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeOpeningHoursModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                    Annuler
+                </button>
+                <button type="button" onclick="saveOpeningHours()" class="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-lg">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Validation Avis -->
+<div id="reviews-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-4xl relative">
+        <button onclick="closeReviewsModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Gestion des avis clients</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Client</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Note</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Commentaire</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for avis in pending_reviews %}
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap">{{ avis.nom }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                {% for i in "12345" %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 {% if i <= avis.note %}text-yellow-400{% else %}text-gray-300{% endif %}" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="px-4 py-4">{{ avis.commentaire|truncatechars:100 }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">{{ avis.date_creation|date:"d/m/Y" }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex space-x-2">
+                                <button onclick="approveReview({{ avis.id }}, true)" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg">
+                                    Approuver
+                                </button>
+                                <button onclick="approveReview({{ avis.id }}, false)" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg">
+                                    Rejeter
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">Aucun avis en attente de validation</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal FAQ -->
+<div id="faq-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-4xl relative">
+        <button onclick="closeFAQModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6">Gestion de la FAQ</h2>
+        
+        <div class="mb-6">
+            <button onclick="showAddFAQModal()" class="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Ajouter une question
+            </button>
+        </div>
+        
+        <div class="space-y-4">
+            {% for faq in faqs %}
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="font-medium">{{ faq.question }}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mt-1">{{ faq.reponse }}</p>
+                    </div>
+                    <div class="flex space-x-2 ml-4">
+                        <button onclick="editFAQ({{ faq.id }})" class="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button onclick="deleteFAQ({{ faq.id }})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                Aucune question FAQ pour le moment
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajout/Modification FAQ -->
+<div id="edit-faq-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-2xl relative">
+        <button onclick="closeEditFAQModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-center mb-6" id="edit-faq-title">Ajouter une question</h2>
+        
+        <form id="edit-faq-form" class="space-y-4">
+            <input type="hidden" id="faq-id">
+            <div>
+                <label for="faq-question" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Question</label>
+                <input type="text" id="faq-question" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+            </div>
+            
+            <div>
+                <label for="faq-answer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Réponse</label>
+                <textarea id="faq-answer" rows="4" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"></textarea>
+            </div>
+            
+            <div>
+                <label for="faq-order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ordre d'affichage</label>
+                <input type="number" id="faq-order" min="0" class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeEditFAQModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">
+                    Annuler
+                </button>
+                <button type="button" onclick="saveFAQ()" class="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-lg">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 {% endblock %}

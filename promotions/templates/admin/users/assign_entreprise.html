@@ -1,0 +1,55 @@
+{% extends 'base1.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Sidebar et header comme dans dashboard.html -->
+    
+    <div class="md:ml-64">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-lg font-semibold text-gray-900">
+                    Assigner une entreprise à {{ user.get_full_name|default:user.username }}
+                </h1>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:p-6">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Entreprise actuelle</label>
+                                <div class="mt-1">
+                                    <input type="text" class="block w-full rounded-md border-gray-300 shadow-sm disabled:bg-gray-100" disabled value="{{ user.entreprise.nom|default:'Aucune entreprise assignée' }}">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="entreprise" class="block text-sm font-medium text-gray-700">Nouvelle entreprise</label>
+                                <select id="entreprise" name="entreprise" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                                    <option value="">-- Aucune entreprise --</option>
+                                    {% for entreprise in entreprises %}
+                                    <option value="{{ entreprise.id }}" {% if user.entreprise.id == entreprise.id %}selected{% endif %}>{{ entreprise.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <a href="{% url 'admin_user_management' %}" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                Annuler
+                            </a>
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                                Assigner
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

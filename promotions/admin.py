@@ -6,6 +6,9 @@ from.models import Utilisateur
 admin.site.register(Categorie)
 admin.site.register(Entreprise)
 admin.site.register(Produit)
+admin.site.register(AvisClient)
+admin.site.register(FAQ)
+admin.site.register(HoraireOuverture)
 # Register your models here.
 from django.contrib import admin
 from . models import *
@@ -14,21 +17,6 @@ from . models import *
 
 # Register your models here.
 
-@admin.register(Utilisateur)
-class UniversalAdmin(admin.ModelAdmin):
-
-    search_fields       = ('first_name', 'email','is_admin' )
-    exclude = ('password',)
-
-    #def get_list_display(self, request):
-    #    return [field.name for field in self.model._meta.concrete_fields]
-
-    def get_list_display(self, request):
-
-        #list_name = [field.name for field in self.model._meta.concrete_fields]
-        list_display = [field.name for field in self.model._meta.concrete_fields]
-
-        return list_display
 
 from django.apps import AppConfig
 
@@ -38,6 +26,18 @@ class PromotionsConfig(AppConfig):
 
 
 class LoginConfig(AppConfig):
-    name = 'login'
+    name = 'promotions'
+@admin.register(Utilisateur)
+class UtilisateurAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Utilisateur._meta.fields]
+    search_fields = ['email', 'first_name', 'last_name']
+    list_filter = ['is_active', 'is_staff', 'is_superuser', 'is_admin']
+    readonly_fields = ['last_login', 'date_joined']  # Optionnel
+    list_editable = ['is_active', 'is_staff', 'is_superuser', 'is_admin']  # Modification directe dans la liste
+    exclude = ['password']  # ou pas, à toi de voir
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('entreprise')
+
 
     

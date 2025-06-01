@@ -1,0 +1,55 @@
+<div class="product-card relative bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+     data-category="{{ produit.categorie.nom|default:'' }}"
+     data-price="{{ produit.prix_promotionnel|default:0 }}"
+     data-discount="{{ produit.discount_percentage|default:0 }}"
+     data-date="{{ produit.date_debut_promo|date:'Y-m-d' }}"
+     data-expiry="{{ produit.date_fin_promo|date:'Y-m-d' }}"
+     onclick="openProductModal({
+         nom: '{{ produit.nom|escapejs }}',
+         entreprise_nom: '{{ produit.entreprise.nom|escapejs }}',
+         telephone: '{{ produit.entreprise.contact|escapejs }}',
+         image_url: '{{ produit.image.url }}',
+         prix: '{{ produit.prix }}',
+         prix_promotionnel: '{{ produit.prix_promotionnel }}',
+         discount_percentage: '{{ produit.discount_percentage }}',
+         description: '{{ produit.description|escapejs }}',
+         quantite: {{ produit.quantite|default:0 }},
+         date_fin_promo: '{{ produit.date_fin_promo|date:'Y-m-d' }}',
+         categorie: '{{ produit.categorie.nom|escapejs }}'
+     })">
+
+    <!-- Badge de promotion -->
+    {% if produit.discount_percentage %}
+        <div class="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow z-10">
+            -{{ produit.discount_percentage }}%
+        </div>
+    {% endif %}
+
+    <!-- Image du produit -->
+    <div class="h-48 overflow-hidden">
+        <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+    </div>
+
+    <!-- Contenu texte -->
+    <div class="p-4 space-y-2">
+        <h3 class="font-bold text-lg truncate text-gray-900 dark:text-white">{{ produit.nom }}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ produit.categorie.nom }}</p>
+
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="block text-sm text-gray-400 dark:text-gray-500 line-through">{{ produit.prix }} FCFA</span>
+                <span class="block text-lg font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                    {{ produit.prix_promotionnel }} FCFA
+                </span>
+            </div>
+        </div>
+
+        <!-- Date d'expiration -->
+        <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Jusqu’au {{ produit.date_fin_promo|date:"d/m/Y" }}
+        </div>
+    </div>
+</div>

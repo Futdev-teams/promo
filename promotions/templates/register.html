@@ -278,6 +278,17 @@
     }
 </style>
 
+{% if messages %}
+  <div class="mb-6">
+    {% for message in messages %}
+      <div class="p-4 rounded-xl text-white {{ message.tags }} bg-green-500 dark:bg-green-600">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
 <div class="cyber-container">
     <div class="floating-icons">
         <!-- Icons flottants ajoutés par JS -->

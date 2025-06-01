@@ -1,0 +1,31 @@
+{% extends 'base1.html' %}
+
+{% block title %}Supprimer {{ entreprise.nom }}{% endblock %}
+{% block header_title %}Supprimer l'entreprise{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:p-6">
+        <div class="text-center">
+            <h3 class="text-lg font-medium text-gray-900">Confirmer la suppression</h3>
+            <div class="mt-2 max-w-xl text-sm text-gray-500">
+                <p>Êtes-vous sûr de vouloir supprimer l'entreprise <strong>{{ entreprise.nom }}</strong> ?</p>
+                <p class="mt-2 font-semibold text-red-600">Cette action est irréversible et supprimera toutes les données associées.</p>
+            </div>
+            <div class="mt-5">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="flex justify-center space-x-3">
+                        <a href="{% url 'admin_entreprise_management' %}" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Annuler
+                        </a>
+                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                            <i class="fas fa-trash mr-2"></i> Supprimer définitivement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -80,11 +80,26 @@
                             <p class="product-price-promo text-lg font-bold text-red-500">Promo : {{ produit.prix_promotionnel }} FCFA</p>
                             <p class="text-sm text-green-600">Taux de promo : {{ produit.discount_percentage }}%</p>
                         </div>
-                        <div class="mt-4 flex justify-between items-center">
-                            <button onclick="openContactPopup('{{ produit.entreprise.nom }}', '{{ produit.nom }}', '{{ produit.entreprise.telephone }}', '{{ produit.entreprise.email }}')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-transform hover:scale-105">Contacter</button>
-                            <a href="{% url 'entreprise_detail' produit.entreprise.id %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-transform hover:scale-105">Entreprise</a>
-                            <button onclick="openDetailsPopup('{{ produit.nom }}', '{{ produit.description }}', '{{ produit.prix }}', '{{ produit.prix_promotionnel }}', '{{ produit.discount_percentage }}', '{{ produit.date_debut_promo|date:"d/m/Y H:i" }}', '{{ produit.date_fin_promo|date:"d/m/Y H:i" }}', '{{ produit.entreprise.nom }}', '{{ produit.entreprise.email }}', '{{ produit.entreprise.telephone }}', '{{ produit.entreprise.localisation }}', '{{ produit.entreprise.logo.url }}', '{{ produit.entreprise.banniere.url }}', '{{ produit.image.url }}')" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-transform hover:scale-105">Détails</button>
-                        </div>
+                        <div class="mt-4 flex flex-wrap justify-center gap-2">
+    <!-- Bouton Contact -->
+    <button onclick="openContactPopup('{{ produit.entreprise.nom }}', '{{ produit.nom }}', '{{ produit.entreprise.contact }}', '{{ produit.entreprise.email }}')" 
+            class="flex-1 min-w-[120px] bg-green-500 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-green-600 transition-all">
+        <i class="fas fa-phone-alt mr-2"></i> Contacter
+    </button>
+    
+    <!-- Bouton Entreprise -->
+    <a href="{% url 'entreprise_public_view' produit.entreprise.id %}" 
+       class="flex-1 min-w-[120px] bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-blue-600 transition-all">
+        <i class="fas fa-building mr-2"></i> Entreprise
+    </a>
+    
+    <!-- Bouton Détails -->
+    <!-- Bouton Détails -->
+                            <button onclick="openDetailsPopup('{{ produit.nom }}', '{{ produit.description|escapejs}}', '{{ produit.prix }}', '{{ produit.prix_promo }}', '{{ produit.taux }}', '{{ produit.date_debut_promo }}', '{{ produit.date_fin_promo }}', '{{ produit.entreprise.nom }}', '{{ produit.entreprise.email }}', '{{ produit.entreprise.telephone }}', '{{ produit.entreprise.localisation }}', '{{ produit.entreprise.logo.url }}', '{{ produit.entreprise.banniere.url }}', '{{ produit.image.url }}')"
+                                    class="flex-1 min-w-[120px] bg-purple-500 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-purple-600 transition-all">
+                                <i class="fas fa-info-circle mr-2"></i> Détails
+                            </button>
+</div>
                     </div>
 
                     <!-- Effet de bordure futuriste -->
@@ -102,45 +117,61 @@
     </div>
 </div>
 
-<!-- Pop-up de contact -->
-<div id="contact-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md relative">
-        <button onclick="closeContactPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-        <h2 class="text-2xl font-bold mb-4 text-blue-500 dark:text-blue-400">Contacter l'entreprise</h2>
-        <div class="mb-4">
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Entreprise:</span> <span id="contact-entreprise"></span></p>
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Produit:</span> <span id="contact-produit"></span></p>
-        </div>
-        <div class="mb-4">
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Téléphone:</span> <span id="contact-telephone"></span></p>
-            <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Email:</span> <span id="contact-email"></span></p>
-        </div>
-        <div class="flex flex-wrap justify-center gap-3 mt-6">
-            <a id="contact-call" href="#" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center flex-1 min-w-[150px] justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                Appeler
-            </a>
-            <a id="contact-whatsapp" href="#" class="bg-[#25D366] text-white px-4 py-2 rounded-lg hover:bg-[#128C7E] flex items-center flex-1 min-w-[150px] justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.018c1.276-.36 2.5-1.238 3.239-2.22l-1.003-.604c-.26.15-.584.234-.928.234-1.035 0-1.875-.84-1.875-1.875v-.468c-.477.266-1.03.422-1.625.422-1.929 0-3.5-1.571-3.5-3.5 0-.595.156-1.148.422-1.625h-.468c-1.036 0-1.875.84-1.875 1.875v6.5c0 1.035.84 1.875 1.875 1.875h6.5c1.036 0 1.875-.84 1.875-1.875v-.094l-.031-.031M12 2.5C6.201 2.5 1.5 7.201 1.5 13c0 1.802.48 3.489 1.32 4.941l-1.246 3.73 3.847-1.229A10.456 10.456 0 0012 23.5c5.799 0 10.5-4.701 10.5-10.5S17.799 2.5 12 2.5"/>
-                </svg>
-                WhatsApp
-            </a>
-            <a id="contact-mail" href="#" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center flex-1 min-w-[150px] justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                Email
-            </a>
-        </div>
+<!-- Contact Popup -->
+<div id="contact-popup" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 relative transform transition-all duration-300 scale-95 opacity-0"
+       id="contact-popup-content">
+    <button onclick="closeContactPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Contacter l'entreprise</h2>
+      <div class="w-20 h-1 bg-gradient-to-r from-purple-500 to-orange-500 mx-auto mt-2 rounded-full"></div>
     </div>
+    
+    <div class="mb-6">
+      <div class="flex items-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+        <span class="font-medium text-gray-700 dark:text-gray-300" id="contact-entreprise"></span>
+      </div>
+      <div class="flex items-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <span class="text-gray-700 dark:text-gray-300" id="contact-produit"></span>
+      </div>
+    </div>
+    
+    <div class="space-y-4">
+      <a id="contact-call" href="#" class="block px-4 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+        </svg>
+        Appeler maintenant
+      </a>
+      
+      <a id="contact-whatsapp" href="#" target="_blank" class="block px-4 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.018c1.276-.36 2.5-1.238 3.239-2.22l-1.003-.604c-.26.15-.584.234-.928.234-1.035 0-1.875-.84-1.875-1.875v-.468c-.477.266-1.03.422-1.625.422-1.929 0-3.5-1.571-3.5-3.5 0-.595.156-1.148.422-1.625h-.468c-1.036 0-1.875.84-1.875 1.875v6.5c0 1.035.84 1.875 1.875 1.875h6.5c1.036 0 1.875-.84 1.875-1.875v-.094l-.031-.031M12 2.5C6.201 2.5 1.5 7.201 1.5 13c0 1.802.48 3.489 1.32 4.941l-1.246 3.73 3.847-1.229A10.456 10.456 0 0012 23.5c5.799 0 10.5-4.701 10.5-10.5S17.799 2.5 12 2.5"/>
+        </svg>
+        Envoyer un message WhatsApp
+      </a>
+      <p class="text-sm"><strong>Téléphone :</strong> {{ entreprise.contact }}</p>
+
+      <a id="contact-mail" href="#" class="block px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+        </svg>
+        Envoyer un email
+      </a>
+    </div>
+  </div>
 </div>
 
 <!-- Pop-up de détails -->
@@ -191,48 +222,72 @@
     </div>
 </div>
 
+
 <script>
     // Fonction pour ouvrir le pop-up de contact
     function openContactPopup(entreprise, produit, telephone, email) {
         document.getElementById('contact-entreprise').textContent = entreprise;
         document.getElementById('contact-produit').textContent = produit;
-        document.getElementById('contact-telephone').textContent = telephone;
-        document.getElementById('contact-email').textContent = email;
         
-        // Configurer les liens d'action
-        document.getElementById('contact-call').href = 'tel:' + telephone;
-        document.getElementById('contact-whatsapp').href = 'https://wa.me/' + telephone.replace(/\D/g, '');
-        document.getElementById('contact-mail').href = 'mailto:' + email;
+        // Format telephone number for WhatsApp
+        const formattedTel = telephone.replace(/\D/g, '');
+        const whatsappUrl = `https://wa.me/${formattedTel}?text=Bonjour ${encodeURIComponent(entreprise)}, je suis intéressé par votre promotion sur ${encodeURIComponent(produit)}. Pourriez-vous m'en dire plus ?`;
         
-        document.getElementById('contact-popup').classList.remove('hidden');
+        // Set contact links
+        document.getElementById('contact-call').href = `tel:${telephone}`;
+        document.getElementById('contact-whatsapp').href = whatsappUrl;
+        document.getElementById('contact-mail').href = `mailto:${email}?subject=Demande d'information sur ${produit}`;
+        
+        // Show popup with animation
+        const popup = document.getElementById('contact-popup');
+        const content = document.getElementById('contact-popup-content');
+        popup.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+        document.body.classList.add('overflow-hidden');
     }
 
     // Fonction pour fermer le pop-up de contact
     function closeContactPopup() {
-        document.getElementById('contact-popup').classList.add('hidden');
+        const content = document.getElementById('contact-popup-content');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            document.getElementById('contact-popup').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
     }
 
-    // Fonction pour ouvrir le pop-up de détails
-    function openDetailsPopup(nom, description, prix, prixPromo, tauxPromo, debut, fin, entrepriseNom, email, contact, localisation, logo, banniere, image) {
+
+
+
+
+    function openDetailsPopup(nom, description, prix, prix_promo, taux, debut, fin, entreprise, email, contact, zone, logo, banniere, image) {
+        // Remplir les éléments du popup
         document.getElementById('popup-nom').textContent = nom;
-        document.getElementById('popup-description').textContent = description;
+        document.getElementById('popup-description').textContent = description || 'Aucune description disponible';
         document.getElementById('popup-prix').textContent = prix;
-        document.getElementById('popup-promo').textContent = prixPromo;
-        document.getElementById('popup-taux').textContent = tauxPromo;
+        document.getElementById('popup-promo').textContent = prix_promo;
+        document.getElementById('popup-taux').textContent = taux;
         document.getElementById('popup-debut').textContent = debut;
         document.getElementById('popup-fin').textContent = fin;
-        document.getElementById('popup-entreprise').textContent = entrepriseNom;
+        document.getElementById('popup-entreprise').textContent = entreprise;
         document.getElementById('popup-email').textContent = email;
         document.getElementById('popup-contact').textContent = contact;
-        document.getElementById('popup-localisation').textContent = localisation;
-        document.getElementById('popup-logo').src = logo;
+        document.getElementById('popup-localisation').textContent = zone;
         document.getElementById('popup-image').src = image;
-        document.getElementById('details-popup').classList.remove('hidden');
+        document.getElementById('popup-logo').src = logo;
+        
+        // Afficher le popup
+        const popup = document.getElementById('details-popup');
+        popup.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
     }
 
-    // Fonction pour fermer le pop-up de détails
     function closeDetailsPopup() {
-        document.getElementById('details-popup').classList.add('hidden');
+        const popup = document.getElementById('details-popup');
+        popup.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
     }
 
     // Fonction pour réinitialiser les filtres

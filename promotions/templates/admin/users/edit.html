@@ -1,0 +1,53 @@
+{% extends 'base1.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Sidebar et header comme dans dashboard.html -->
+    
+    <div class="md:ml-64">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-lg font-semibold text-gray-900">
+                    {% if form.instance.id %}Modifier l'utilisateur{% else %}Créer un nouvel utilisateur{% endif %}
+                </h1>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:p-6">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-6">
+                            {% for field in form %}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                                <div class="mt-1">
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <p class="mt-2 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                                {% if field.help_text %}
+                                <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <a href="{% url 'admin_user_management' %}" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                Annuler
+                            </a>
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                                Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

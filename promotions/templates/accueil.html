@@ -5,7 +5,7 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
   <!-- Hero Section with Typing Effect -->
   <div class="relative overflow-hidden rounded-b-2xl shadow-xl">
-    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-orange-500 opacity-90"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-yellow-500 opacity-90"></div>
     <div class="relative max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
       <div class="text-center">
         <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
@@ -17,14 +17,6 @@
         <div class="mt-8 flex justify-center gap-4">
           <button onclick="scrollToPromotions()" class="px-6 py-3 bg-white text-purple-600 font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
             Explorer les offres
-          </button>
-          <button onclick="showNewsletterModal()" class="px-6 py-3 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:bg-opacity-10 transition-all transform hover:scale-105">
-            <span class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Recevoir les alertes
-            </span>
           </button>
         </div>
       </div>
@@ -38,7 +30,7 @@
       <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Promotions actives</div>
     </div>
     <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
-      <div class="text-3xl font-bold bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">{{ categories.count }}</div>
+      <div class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-yellow-600 bg-clip-text text-transparent">{{ categories.count }}</div>
       <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Catégories</div>
     </div>
     <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
@@ -46,7 +38,7 @@
       <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Entreprises</div>
     </div>
     <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg text-center glow-on-hover">
-      <div class="text-3xl font-bold bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">{{ users_count }}+</div>
+      <div class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-yellow-500 bg-clip-text text-transparent">4057+</div>
       <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">Utilisateurs satisfaits</div>
     </div>
   </div>
@@ -272,7 +264,7 @@
         Appeler maintenant
       </a>
       
-      <a id="contact-whatsapp" href="#" class="block px-4 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
+      <a id="contact-whatsapp" href="#" target="_blank" class="block px-4 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-md">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.018c1.276-.36 2.5-1.238 3.239-2.22l-1.003-.604c-.26.15-.584.234-.928.234-1.035 0-1.875-.84-1.875-1.875v-.468c-.477.266-1.03.422-1.625.422-1.929 0-3.5-1.571-3.5-3.5 0-.595.156-1.148.422-1.625h-.468c-1.036 0-1.875.84-1.875 1.875v6.5c0 1.035.84 1.875 1.875 1.875h6.5c1.036 0 1.875-.84 1.875-1.875v-.094l-.031-.031M12 2.5C6.201 2.5 1.5 7.201 1.5 13c0 1.802.48 3.489 1.32 4.941l-1.246 3.73 3.847-1.229A10.456 10.456 0 0012 23.5c5.799 0 10.5-4.701 10.5-10.5S17.799 2.5 12 2.5"/>
         </svg>
@@ -287,65 +279,6 @@
         Envoyer un email
       </a>
     </div>
-  </div>
-</div>
-
-<!-- Newsletter Modal -->
-<div id="newsletter-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 relative transform transition-all duration-300 scale-95 opacity-0"
-       id="newsletter-modal-content">
-    <button onclick="closePopup('newsletter-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-    
-    <div class="text-center mb-6">
-      <h3 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Recevez les meilleures promotions</h3>
-      <div class="w-20 h-1 bg-gradient-to-r from-purple-500 to-orange-500 mx-auto mt-2 rounded-full"></div>
-    </div>
-    
-    <p class="text-gray-600 dark:text-gray-400 mb-6 text-center">Abonnez-vous pour ne manquer aucune offre exceptionnelle près de chez vous.</p>
-    
-    <form id="newsletter-form" class="space-y-4" method="POST" action="{% url 'newsletter_subscribe' %}">
-      {% csrf_token %}
-      <div>
-        <label for="newsletter-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Votre email</label>
-        <input type="email" id="newsletter-email" name="email" required class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300">
-      </div>
-      
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fréquence des alertes</label>
-        <div class="grid grid-cols-3 gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="frequency" value="daily" class="form-radio h-4 w-4 text-purple-600 focus:ring-purple-500">
-            <span class="ml-2 text-sm">Quotidien</span>
-          </label>
-          <label class="inline-flex items-center">
-            <input type="radio" name="frequency" value="weekly" checked class="form-radio h-4 w-4 text-purple-600 focus:ring-purple-500">
-            <span class="ml-2 text-sm">Hebdo</span>
-          </label>
-          <label class="inline-flex items-center">
-            <input type="radio" name="frequency" value="monthly" class="form-radio h-4 w-4 text-purple-600 focus:ring-purple-500">
-            <span class="ml-2 text-sm">Mensuel</span>
-          </label>
-        </div>
-      </div>
-      
-      <div class="flex items-start">
-        <input type="checkbox" id="newsletter-terms" name="terms" required class="mt-1 form-checkbox h-4 w-4 text-purple-600 focus:ring-purple-500">
-        <label for="newsletter-terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-          J'accepte de recevoir des offres promotionnelles et je confirme avoir lu la 
-          <a href="#" class="text-purple-600 hover:text-purple-500">politique de confidentialité</a>
-        </label>
-      </div>
-      
-      <div class="pt-4">
-        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-300 font-medium shadow-md">
-          S'abonner maintenant
-        </button>
-      </div>
-    </form>
   </div>
 </div>
 
@@ -505,352 +438,192 @@
         const zoneSearch = document.getElementById('zone-filter').value.toLowerCase();
         const categorySearch = document.getElementById('category-filter').value;
         const searchTerm = document.getElementById('search-input').value.toLowerCase();
-        const sortOption = document.querySelector('.sort-btn.active')?.dataset.sort || 'recent';
         
-        const products = document.querySelectorAll('.product-card');
-        let visibleCount = 0;
+        // Get active sort button
+            let sortOption = 'recent';
+    if (document.getElementById('sort-recent').classList.contains('bg-purple-100') || 
+        document.getElementById('sort-recent').classList.contains('dark:bg-purple-900')) {
+        sortOption = 'recent';
+    } else if (document.getElementById('sort-asc').classList.contains('bg-purple-100') || 
+               document.getElementById('sort-asc').classList.contains('dark:bg-purple-900')) {
+        sortOption = 'asc';
+    } else if (document.getElementById('sort-desc').classList.contains('bg-purple-100') || 
+               document.getElementById('sort-desc').classList.contains('dark:bg-purple-900')) {
+        sortOption = 'desc';
+    }
+
+    const products = document.querySelectorAll('.product-card');
+    let visibleCount = 0;
+    
+    // Filtrer les produits
+    products.forEach(product => {
+        const price = parseFloat(product.dataset.price);
+        const zone = product.dataset.zone.toLowerCase();
+        const category = product.dataset.categorie;
+        const name = product.dataset.name;
+        const entreprise = product.dataset.entreprise;
+        const date = parseInt(product.dataset.date);
         
-        // Filtrer les produits
-        products.forEach(product => {
-            const price = parseFloat(product.dataset.price);
-            const zone = product.dataset.zone.toLowerCase();
-            const category = product.dataset.categorie;
-            const name = product.dataset.name;
-            const entreprise = product.dataset.entreprise;
-            const date = parseInt(product.dataset.date);
-            
-            const priceMatch = price >= minPrice && price <= maxPrice;
-            const zoneMatch = !zoneSearch || zone.includes(zoneSearch);
-            const categoryMatch = !categorySearch || category === categorySearch;
-            const searchMatch = !searchTerm || 
-                               name.includes(searchTerm) || 
-                               entreprise.includes(searchTerm);
-            
-            if (priceMatch && zoneMatch && categoryMatch && searchMatch) {
-                product.style.display = 'block';
-                visibleCount++;
-            } else {
-                product.style.display = 'none';
-            }
-        });
+        const priceMatch = price >= minPrice && price <= maxPrice;
+        const zoneMatch = !zoneSearch || zone.includes(zoneSearch);
+        const categoryMatch = !categorySearch || category === categorySearch;
+        const searchMatch = !searchTerm || 
+                           name.includes(searchTerm) || 
+                           entreprise.includes(searchTerm);
         
-        // Trier les produits
-        const container = document.getElementById('products-container');
-        const productArray = Array.from(products).filter(p => p.style.display !== 'none');
-        
-        productArray.sort((a, b) => {
-            const priceA = parseFloat(a.dataset.price);
-            const priceB = parseFloat(b.dataset.price);
-            const dateA = parseInt(a.dataset.date);
-            const dateB = parseInt(b.dataset.date);
-            
-            if (sortOption === 'asc') return priceA - priceB;
-            if (sortOption === 'desc') return priceB - priceA;
-            return dateB - dateA; // Par défaut: plus récent en premier
-        });
-        
-        // Réorganiser les produits dans le DOM
-        productArray.forEach(product => {
-            container.appendChild(product);
-        });
-        
-        // Afficher/masquer le message "Aucun résultat"
-        document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
-        document.getElementById('products-count').textContent = visibleCount;
-        
-        // Afficher le compteur filtré
-        const filteredCount = document.getElementById('filtered-count');
-        const filteredNumber = document.getElementById('filtered-number');
-        
-        if (minPrice || maxPrice || zoneSearch || categorySearch || searchTerm) {
-            filteredCount.classList.remove('hidden');
-            filteredNumber.textContent = visibleCount;
+        if (priceMatch && zoneMatch && categoryMatch && searchMatch) {
+            product.style.display = 'block';
+            visibleCount++;
         } else {
-            filteredCount.classList.add('hidden');
+            product.style.display = 'none';
         }
-        
-        // Mettre à jour les filtres actifs
-        updateActiveFiltersDisplay();
-    }
-
-    // Mettre à jour l'affichage des filtres actifs
-    function updateActiveFiltersDisplay() {
-        const activeFiltersContainer = document.getElementById('active-filters');
-        activeFiltersContainer.innerHTML = '';
-        
-        const minPrice = document.getElementById('min-price').value;
-        const maxPrice = document.getElementById('max-price').value;
-        const zoneFilter = document.getElementById('zone-filter').value;
-        const categoryFilter = document.getElementById('category-filter').value;
-        const searchTerm = document.getElementById('search-input').value;
-        
-        let hasActiveFilters = false;
-        
-        if (zoneFilter) {
-            addActiveFilter('Localisation: ' + zoneFilter, 'zone');
-            hasActiveFilters = true;
-        }
-        
-        if (categoryFilter) {
-            const categoryText = document.getElementById('category-filter').options[document.getElementById('category-filter').selectedIndex].text;
-            addActiveFilter('Catégorie: ' + categoryText, 'category');
-            hasActiveFilters = true;
-        }
-        
-        if (minPrice || maxPrice) {
-            let priceText = 'Prix: ';
-            if (minPrice && maxPrice) {
-                priceText += `${minPrice} - ${maxPrice} FCFA`;
-            } else if (minPrice) {
-                priceText += `À partir de ${minPrice} FCFA`;
-            } else {
-                priceText += `Jusqu'à ${maxPrice} FCFA`;
-            }
-            addActiveFilter(priceText, 'price');
-            hasActiveFilters = true;
-        }
-        
-        if (searchTerm) {
-            addActiveFilter('Recherche: "' + searchTerm + '"', 'search');
-            hasActiveFilters = true;
-        }
-        
-        activeFiltersContainer.classList.toggle('hidden', !hasActiveFilters);
-    }
-    
-    // Ajouter un filtre actif
-    function addActiveFilter(text, type) {
-        const chip = document.createElement('div');
-        chip.className = 'flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300';
-        chip.innerHTML = `
-            ${text}
-            <button onclick="removeFilter('${type}')" class="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        `;
-        document.getElementById('active-filters').appendChild(chip);
-    }
-    
-    // Supprimer un filtre spécifique
-    function removeFilter(type) {
-        switch(type) {
-            case 'zone':
-                document.getElementById('zone-filter').value = '';
-                break;
-            case 'category':
-                document.getElementById('category-filter').value = '';
-                break;
-            case 'price':
-                document.getElementById('min-price').value = '';
-                document.getElementById('max-price').value = '';
-                break;
-            case 'search':
-                document.getElementById('search-input').value = '';
-                break;
-        }
-        applyFilters();
-    }
-
-    // Fermer un popup générique
-    function closePopup(id) {
-        const content = document.getElementById(`${id}-content`);
-        content.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-            document.getElementById(id).classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        }, 300);
-    }
-
-    // Afficher la modal newsletter
-    function showNewsletterModal() {
-        const popup = document.getElementById('newsletter-modal');
-        const content = document.getElementById('newsletter-modal-content');
-        popup.classList.remove('hidden');
-        setTimeout(() => {
-            content.classList.remove('scale-95', 'opacity-0');
-        }, 10);
-        document.body.classList.add('overflow-hidden');
-    }
-
-    // Afficher une notification de succès
-    function showSuccessNotification(message) {
-        const notification = document.getElementById('success-notification');
-        const messageElement = document.getElementById('notification-message');
-        
-        messageElement.textContent = message;
-        notification.classList.remove('translate-x-full');
-        
-        setTimeout(() => {
-            notification.classList.add('translate-x-full');
-        }, 3000);
-    }
-
-    // Faire défiler jusqu'à la section des promotions
-    function scrollToPromotions() {
-        document.getElementById('promotions').scrollIntoView({
-            behavior: 'smooth'
-        });
-    }
-
-    // Initialize event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-        // Apply filters when any filter changes
-        document.getElementById('min-price').addEventListener('input', applyFilters);
-        document.getElementById('max-price').addEventListener('input', applyFilters);
-        document.getElementById('zone-filter').addEventListener('input', applyFilters);
-        document.getElementById('category-filter').addEventListener('change', applyFilters);
-        document.getElementById('search-input').addEventListener('input', applyFilters);
-        
-        // Set default sort to recent
-        setSortOption('recent');
-        
-        // Newsletter form submission
-        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simulate form submission
-            setTimeout(() => {
-                closePopup('newsletter-modal');
-                showSuccessNotification('Merci pour votre inscription à notre newsletter !');
-                this.reset();
-            }, 1000);
-        });
-        
-        // Apply filters on load
-        applyFilters();
     });
-</script>
-
-<style>
-    /* Typing cursor effect */
-    .typing-text::after {
-        content: '|';
-        animation: blink 1s infinite;
-    }
     
-    @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0; }
-    }
+    // Trier les produits
+    const container = document.getElementById('products-container');
+    const productArray = Array.from(products).filter(p => p.style.display !== 'none');
     
-    /* Glow effect on hover */
-    .glow-on-hover {
-        transition: box-shadow 0.3s ease;
-    }
-    
-    .glow-on-hover:hover {
-        box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
-    }
-    
-    /* Gradient text */
-    .text-gradient {
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-    }
-    
-    /* Smooth transitions */
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-    
-    /* Modern shadows */
-    .shadow-2xl {
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Dark mode transitions */
-    .dark .product-card {
-        transition: background-color 0.3s, border-color 0.3s;
-    }
-    
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: rgba(168, 85, 247, 0.5);
-        border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(168, 85, 247, 0.7);
-    }
-    
-    /* Backdrop blur for modals */
-    .backdrop-blur-sm {
-        backdrop-filter: blur(4px);
-    }
-    
-    /* Button hover effects */
-    .hover\:opacity-90:hover {
-        opacity: 0.9;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 640px) {
-        #products-container {
-            grid-template-columns: 1fr;
-        }
+    productArray.sort((a, b) => {
+        const priceA = parseFloat(a.dataset.price);
+        const priceB = parseFloat(b.dataset.price);
+        const dateA = parseInt(a.dataset.date);
+        const dateB = parseInt(b.dataset.date);
         
-        .flex.justify-between.items-start {
-            flex-direction: column;
-            gap: 1rem;
+        if (sortOption === 'asc') return priceA - priceB;
+        if (sortOption === 'desc') return priceB - priceA;
+        return dateB - dateA; // Par défaut: plus récent en premier
+    });
+    
+    // Réorganiser les produits dans le DOM
+    productArray.forEach(product => {
+        container.appendChild(product);
+    });
+    
+    // Afficher/masquer le message "Aucun résultat"
+    document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+    document.getElementById('products-count').textContent = visibleCount;
+    
+    // Afficher le compteur filtré
+    const filteredCount = document.getElementById('filtered-count');
+    const filteredNumber = document.getElementById('filtered-number');
+    
+    if (minPrice || maxPrice || zoneSearch || categorySearch || searchTerm) {
+        filteredCount.classList.remove('hidden');
+        filteredNumber.textContent = visibleCount;
+    } else {
+        filteredCount.classList.add('hidden');
+    }
+    
+    // Mettre à jour les filtres actifs
+    updateActiveFiltersDisplay();
+}
+
+// Mettre à jour l'affichage des filtres actifs
+function updateActiveFiltersDisplay() {
+    const activeFiltersContainer = document.getElementById('active-filters');
+    activeFiltersContainer.innerHTML = '';
+    
+    const minPrice = document.getElementById('min-price').value;
+    const maxPrice = document.getElementById('max-price').value;
+    const zoneFilter = document.getElementById('zone-filter').value;
+    const categoryFilter = document.getElementById('category-filter').value;
+    const searchTerm = document.getElementById('search-input').value;
+    
+    let hasActiveFilters = false;
+    
+    if (zoneFilter) {
+        addActiveFilter('Localisation: ' + zoneFilter, 'zone');
+        hasActiveFilters = true;
+    }
+    
+    if (categoryFilter) {
+        const categoryText = document.getElementById('category-filter').options[document.getElementById('category-filter').selectedIndex].text;
+        addActiveFilter('Catégorie: ' + categoryText, 'category');
+        hasActiveFilters = true;
+    }
+    
+    if (minPrice || maxPrice) {
+        let priceText = 'Prix: ';
+        if (minPrice && maxPrice) {
+            priceText += `${minPrice} - ${maxPrice} FCFA`;
+        } else if (minPrice) {
+            priceText += `À partir de ${minPrice} FCFA`;
+        } else {
+            priceText += `Jusqu'à ${maxPrice} FCFA`;
         }
+        addActiveFilter(priceText, 'price');
+        hasActiveFilters = true;
     }
     
-    /* Animation for popups */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+    if (searchTerm) {
+        addActiveFilter('Recherche: "' + searchTerm + '"', 'search');
+        hasActiveFilters = true;
     }
     
-    /* WhatsApp button highlight */
-    .whatsapp-btn {
-        background-color: #25D366;
-        transition: all 0.3s ease;
+    activeFiltersContainer.classList.toggle('hidden', !hasActiveFilters);
+}
+
+// Ajouter un filtre actif
+function addActiveFilter(text, type) {
+    const chip = document.createElement('div');
+    chip.className = 'flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300';
+    chip.innerHTML = `
+        ${text}
+        <button onclick="removeFilter('${type}')" class="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    `;
+    document.getElementById('active-filters').appendChild(chip);
+}
+
+// Supprimer un filtre spécifique
+function removeFilter(type) {
+    switch(type) {
+        case 'zone':
+            document.getElementById('zone-filter').value = '';
+            break;
+        case 'category':
+            document.getElementById('category-filter').value = '';
+            break;
+        case 'price':
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            break;
+        case 'search':
+            document.getElementById('search-input').value = '';
+            break;
     }
+    applyFilters();
+}
+
+// Faire défiler jusqu'à la section des promotions
+function scrollToPromotions() {
+    document.getElementById('promotions').scrollIntoView({
+        behavior: 'smooth'
+    });
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply filters when any filter changes
+    document.getElementById('min-price').addEventListener('input', applyFilters);
+    document.getElementById('max-price').addEventListener('input', applyFilters);
+    document.getElementById('zone-filter').addEventListener('input', applyFilters);
+    document.getElementById('category-filter').addEventListener('change', applyFilters);
+    document.getElementById('search-input').addEventListener('input', applyFilters);
     
-    .whatsapp-btn:hover {
-        background-color: #128C7E;
-        transform: translateY(-2px);
-    }
+    // Set default sort to recent
+    setSortOption('recent');
     
-    /* Pulse animation */
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-    
-    .animate-pulse {
-        animation: pulse 2s infinite;
-    }
-    
-    /* Bounce animation */
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-    
-    .animate-bounce {
-        animation: bounce 1s infinite;
-    }
-    
-    /* Product image overlay */
-    .product-card .relative.h-48::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
-        z-index: 10;
-    }
-</style>
+    // Apply filters on load
+    applyFilters();
+});
+</script>
+<style> 
+/* Typing cursor effect */ 
+.typing-text::after { content: '|'; animation: blink 1s infinite; } 
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } } /* Glow effect on hover */ .glow-on-hover { transition: box-shadow 0.3s ease; } .glow-on-hover:hover { box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); } /* Gradient text */ .text-gradient { background-clip: text; -webkit-background-clip: text; color: transparent; } /* Smooth transitions */ .transition-all { transition: all 0.3s ease; } /* Modern shadows */ .shadow-2xl { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); } /* Dark mode transitions */ .dark .product-card { transition: background-color 0.3s, border-color 0.3s; } /* Scrollbar styling */ ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); } ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.7); } /* Backdrop blur for modals */ .backdrop-blur-sm { backdrop-filter: blur(4px); } /* Button hover effects */ .hover\:opacity-90:hover { opacity: 0.9; } /* Responsive adjustments */ @media (max-width: 640px) { #products-container { grid-template-columns: 1fr; } .flex.justify-between.items-start { flex-direction: column; gap: 1rem; } } /* Animation for popups */ @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } } /* WhatsApp button highlight */ .whatsapp-btn { background-color: #25D366; transition: all 0.3s ease; } .whatsapp-btn:hover { background-color: #128C7E; transform: translateY(-2px); } /* Pulse animation */ @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } } .animate-pulse { animation: pulse 2s infinite; } /* Bounce animation */ @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } } .animate-bounce { animation: bounce 1s infinite; } /* Product image overlay */ .product-card .relative.h-48::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); z-index: 10; } </style>
+
 {% endblock %}

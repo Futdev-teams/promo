@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}PromoSite{% endblock %}</title>
+    {% load static %}
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -351,14 +354,15 @@
     <!-- Header futuriste -->
     <header class="fixed top-0 w-full z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold logo-gradient">PromoSite</a>
+            <a href="/" class="fas fa-gift mr-3 text-2xl font-bold logo-gradient">    PromoSite</a>
             
             <!-- Navigation desktop futuriste -->
             <div class="hidden md:flex items-center space-x-8">
                 <a href="/" class="nav-link">Accueil</a>
-                <a href="/entreprise" class="nav-link">Entreprises</a>
+                <a href="/promotions-actives" class="nav-link">Promotions en cours</a>
                 <a href="/archives" class="nav-link">Archives</a>
-                <a href="/contact" class="nav-link">Contact</a>
+                <a href="/entreprise" class="nav-link">Entreprises</a>
+
                 
                 {% if user.is_authenticated %}
                 <!-- Menu utilisateur futuriste -->
@@ -391,6 +395,7 @@
                     </div>
                 </div>
                 {% else %}
+                <a href="/demande-inscription" class="nav-link">Inscription</a>
                 <a href="{% url 'login' %}" class="nav-link">Connexion</a>
                 {% endif %}
                 
@@ -416,18 +421,20 @@
                     <i class="fas fa-home mr-3 text-accent-color"></i>
                     Accueil
                 </a>
-                <a href="/entreprise" class="nav-link flex items-center">
-                    <i class="fas fa-building mr-3 text-accent-color"></i>
-                    Entreprises
+                <a href="/promotions-actives" class="nav-link flex items-center">
+                    <i class="fas fa-gift mr-3 text-accent-color"></i>
+                    Promotions en cours
                 </a>
                 <a href="/archives" class="nav-link flex items-center">
                     <i class="fas fa-archive mr-3 text-accent-color"></i>
                     Archives
                 </a>
-                <a href="/contact" class="nav-link flex items-center">
-                    <i class="fas fa-envelope mr-3 text-accent-color"></i>
-                    Contact
+                <a href="/entreprise" class="nav-link flex items-center">
+                    <i class="fas fa-building mr-3 text-accent-color"></i>
+                    Entreprises
                 </a>
+                
+                
                 
                 {% if user.is_authenticated %}
                 <div class="pt-4 mt-4 border-t border-opacity-10" style="border-color: var(--header-border);">
@@ -455,6 +462,10 @@
                     </a>
                 </div>
                 {% else %}
+                <a href="/demande-inscription" class="nav-link flex items-center">
+                    <i class="fas fa-envelope mr-3 text-accent-color"></i>
+                    Inscription
+                </a>
                 <a href="{% url 'login' %}" class="nav-link flex items-center">
                     <i class="fas fa-sign-in-alt mr-3 text-accent-color"></i>
                     Connexion
@@ -476,28 +487,9 @@
     <!-- Footer futuriste -->
     <footer class="fixed bottom-0 w-full z-40">
         <div class="container mx-auto text-center py-3">
-            <p class="text-sm">&copy; 2025 PromoSite. Tous droits réservés.</p>
+            <p class="text-sm">&copy; 2025 PromoSite. Tous droits réservés.&copy; team_wfm_of_life</p>
         </div>
         
-        <!-- Navigation mobile futuriste -->
-        <div class="md:hidden flex justify-around items-center py-3 px-4">
-            <a href="/" class="mobile-nav-item flex flex-col items-center text-xs">
-                <i class="fas fa-home text-lg mb-1"></i>
-                <span>Accueil</span>
-            </a>
-            <a href="/entreprise" class="mobile-nav-item flex flex-col items-center text-xs">
-                <i class="fas fa-building text-lg mb-1"></i>
-                <span>Entreprises</span>
-            </a>
-            <a href="/archives" class="mobile-nav-item flex flex-col items-center text-xs">
-                <i class="fas fa-archive text-lg mb-1"></i>
-                <span>Archives</span>
-            </a>
-            <a href="/contact" class="mobile-nav-item flex flex-col items-center text-xs">
-                <i class="fas fa-envelope text-lg mb-1"></i>
-                <span>Contact</span>
-            </a>
-        </div>
     </footer>
 
     <!-- Scripts JavaScript futuristes -->
@@ -544,7 +536,7 @@
                 // Animation sonore (optionnelle)
                 if (mobileMenu.classList.contains('open')) {
                     const audio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-                    audio.volume = 0.1;
+                    audio.volume = 0.9;
                     audio.play().catch(e => {});
                 }
             });
