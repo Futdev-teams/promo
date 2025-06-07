@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+  <!-- Hero Section -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-bold text-blue-600 mb-6 animate-fade-in">
+        🛍 À propos de <span class="text-orange-500">Promo-Plus</span>
+      </h1>
+      <p class="text-xl text-gray-700 mb-8 leading-relaxed">
+        La plateforme intelligente qui révolutionne votre expérience shopping en vous connectant aux meilleures promotions locales en temps réel.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="#client-benefits" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105">
+          Je suis client
+        </a>
+        <a href="#business-benefits" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105">
+          Je suis entreprise
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value Proposition -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-600 mb-4">🎯 Pourquoi choisir Promo-Plus ?</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Finies les promotions manquées ! Promo-Plus vous connecte directement aux offres autour de vous.
+        </p>
+      </div>
+
+      <div class="bg-blue-50 rounded-xl p-6 mb-8 border-l-4 border-orange-500">
+        <p class="text-lg italic text-gray-700">
+          "Imaginez : vous entrez dans un supermarché, un restaurant ou un hôtel... sans savoir qu'une promo est en cours. Grâce à Promo-Plus, ce temps est révolu."
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 lg:col-span-1">
+          <div class="text-blue-600 text-3xl mb-4">🔍</div>
+          <h3 class="font-bold text-lg mb-2">Recherchez</h3>
+          <p class="text-gray-600">Une entreprise, un lieu ou une catégorie.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 lg:col-span-1">
+          <div class="text-blue-600 text-3xl mb-4">📍</div>
+          <h3 class="font-bold text-lg mb-2">Repérez</h3>
+          <p class="text-gray-600">Les promos proches de chez vous.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 lg:col-span-1">
+          <div class="text-blue-600 text-3xl mb-4">📱</div>
+          <h3 class="font-bold text-lg mb-2">Scannez</h3>
+          <p class="text-gray-600">Le QR code à l'entrée pour voir les offres.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 lg:col-span-1">
+          <div class="text-blue-600 text-3xl mb-4">💬</div>
+          <h3 class="font-bold text-lg mb-2">Contactez</h3>
+          <p class="text-gray-600">Directement l'entreprise pour les détails.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 lg:col-span-1">
+          <div class="text-blue-600 text-3xl mb-4">🌐</div>
+          <h3 class="font-bold text-lg mb-2">Ajoutez</h3>
+          <p class="text-gray-600">Vos boutiques favorites à votre écran d'accueil.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For Businesses -->
+  <section id="business-benefits" class="py-16 px-4 sm:px-6 lg:px-8 bg-blue-50">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-600 mb-4">🧑‍💼 Pour les Entreprises</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Augmentez votre visibilité et attirez plus de clients avec vos promotions.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div>
+          <h3 class="text-2xl font-semibold text-blue-600 mb-4">Ce que nous vous offrons :</h3>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3">✅</span>
+              <span>Une <strong>page boutique en ligne</strong> pour publier vos promos</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3">✅</span>
+              <span>Les promos expirées <strong>disparaissent automatiquement</strong></span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3">✅</span>
+              <span>Un <strong>QR code sécurisé</strong> à afficher dans votre établissement</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3">✅</span>
+              <span>Un outil pour <strong>centraliser toutes vos offres</strong></span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-3">✅</span>
+              <span>Une <strong>inscription gratuite pendant 3 mois</strong> pour tester sans risque</span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-xl font-semibold text-blue-600 mb-4">Exemples concrets :</h3>
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-2 rounded-full mr-3">
+                <span class="text-blue-600">🍽️</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Promo sur vos plats du jour</h4>
+                <p class="text-sm text-gray-600">Vos clients voient l'offre avant même d'entrer.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-2 rounded-full mr-3">
+                <span class="text-blue-600">👟</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Chaussures en solde</h4>
+                <p class="text-sm text-gray-600">Publiez, attirez les clients, augmentez vos ventes.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-2 rounded-full mr-3">
+                <span class="text-blue-600">🎓</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Formation à prix réduit</h4>
+                <p class="text-sm text-gray-600">Gagnez en visibilité auprès des personnes intéressées.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-2 rounded-full mr-3">
+                <span class="text-blue-600">🏨</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Chambres d'hôtel disponibles</h4>
+                <p class="text-sm text-gray-600">Remplissez vos chambres avec des offres last-minute.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-blue-600 text-white p-6 rounded-xl">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="mb-4 md:mb-0">
+            <h3 class="text-xl font-bold mb-2">💡 Résultat :</h3>
+            <p class="text-blue-100">Plus de clients. Plus de visibilité. Moins de promos perdues.</p>
+          </div>
+          <div class="text-center md:text-right">
+            <p class="text-sm text-blue-200 mb-2">Après 3 mois d'essai gratuit</p>
+            <p class="text-2xl font-bold">À partir de 25 000 CFA/mois</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For Clients -->
+  <section id="client-benefits" class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-600 mb-4">🧑 Pour les Clients</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Votre compagnon shopping pour ne jamais manquer une bonne affaire.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div>
+          <h3 class="text-2xl font-semibold text-blue-600 mb-4">Comment ça marche :</h3>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <span class="text-blue-500 mr-3">🔍</span>
+              <span><strong>Recherchez</strong> une entreprise ou une catégorie (restaurant, mode, université...)</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-500 mr-3">📍</span>
+              <span><strong>Découvrez</strong> les promos en cours avec photos et détails</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-500 mr-3">🏷</span>
+              <span><strong>Ajoutez</strong> vos boutiques favorites à votre écran d'accueil</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-500 mr-3">📩</span>
+              <span><strong>Suggérez</strong> des améliorations à notre équipe</span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-blue-50 p-6 rounded-xl">
+          <h3 class="text-xl font-semibold text-blue-600 mb-4">Cas concrets :</h3>
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="bg-orange-100 p-2 rounded-full mr-3">
+                <span class="text-orange-600">✈️</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Voyage à Kpalimé</h4>
+                <p class="text-sm text-gray-600">Consultez les chambres d'hôtel en promotion.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="bg-orange-100 p-2 rounded-full mr-3">
+                <span class="text-orange-600">🏍️</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Achat d'une moto</h4>
+                <p class="text-sm text-gray-600">Trouvez les concessions avec des offres spéciales.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="bg-orange-100 p-2 rounded-full mr-3">
+                <span class="text-orange-600">🍔</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Dîner au restaurant</h4>
+                <p class="text-sm text-gray-600">Découvrez les menus à prix réduit près de chez vous.</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="bg-orange-100 p-2 rounded-full mr-3">
+                <span class="text-orange-600">🛒</span>
+              </div>
+              <div>
+                <h4 class="font-medium">Courses quotidiennes</h4>
+                <p class="text-sm text-gray-600">Identifiez les supermarchés avec des promotions sur vos produits préférés.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <p class="text-gray-600 mb-6">Une suggestion ? Une idée d'amélioration ?</p>
+        <a href="mailto:elmaniora1234@gmail.com" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300">
+          Contactez-nous
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Preview -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-600 mb-4">📸 À quoi s'attendre</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Une interface claire et intuitive pour une expérience utilisateur optimale.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="text-4xl mb-4">🎥</div>
+          <h3 class="font-bold text-lg mb-2">Promos en images</h3>
+          <p class="text-gray-600">Visualisez les produits en promotion</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="text-4xl mb-4">📷</div>
+          <h3 class="font-bold text-lg mb-2">Photos détaillées</h3>
+          <p class="text-gray-600">Voyez les articles en réduction</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="text-4xl mb-4">🧍‍♂️</div>
+          <h3 class="font-bold text-lg mb-2">Illustrations claires</h3>
+          <p class="text-gray-600">Des visuels pour comprendre rapidement</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="text-4xl mb-4">🎨</div>
+          <h3 class="font-bold text-lg mb-2">Design moderne</h3>
+          <p class="text-gray-600">Une interface agréable à utiliser</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & Commitments -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-600 mb-4">🔒 Nos engagements</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          La transparence et la sécurité sont au cœur de notre plateforme.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-red-50 p-6 rounded-xl border-l-4 border-red-500">
+          <h3 class="text-xl font-semibold text-red-600 mb-4">Authenticité des promos</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="text-red-500 mr-2">🚫</span>
+              <span>Toute entreprise doit <strong>publier uniquement des promotions réelles</strong></span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-red-500 mr-2">⚠️</span>
+              <span>En cas de signalements multiples, <strong>la boutique sera suspendue</strong></span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
+          <h3 class="text-xl font-semibold text-green-600 mb-4">Sécurité des transactions</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="text-green-500 mr-2">🛡️</span>
+              <span><strong>Pas de paiement en ligne</strong> pour éviter les fraudes</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-green-500 mr-2">💬</span>
+              <span>Vous discutez <strong>directement avec l'entreprise</strong></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Legal Section -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-blue-600 mb-4">📜 Informations légales</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Consultez nos conditions d'utilisation et notre politique de confidentialité.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+        <button onclick="toggleModal('conditions-modal')" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-3 px-6 border border-gray-300 rounded-lg shadow-sm transition-all duration-300 flex items-center justify-center">
+          <span class="mr-2">📘</span> Conditions d'utilisation
+        </button>
+        <button onclick="toggleModal('privacy-modal')" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-3 px-6 border border-gray-300 rounded-lg shadow-sm transition-all duration-300 flex items-center justify-center">
+          <span class="mr-2">🔐</span> Politique de confidentialité
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-6">🔔 Prêt à commencer ?</h2>
+      <p class="text-xl mb-8 max-w-3xl mx-auto">
+        Inscrivez-vous gratuitement et transformez votre expérience shopping dès aujourd'hui !
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="{% url 'signup' %}" class="bg-white hover:bg-gray-100 text-blue-600 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105">
+          S'inscrire maintenant
+        </a>
+        <a href='{% url 'login' %}'class="border-2 border-white hover:bg-white hover:text-blue-600 font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 transform hover:scale-105">
+          Se connecter
+        </a>
+      </div>
+      <p class="mt-8 text-blue-200 italic">
+        "Promo-Plus, la référence en matière de promotions locales, claires et accessibles."
+      </p>
+    </div>
+  </section>
+
+  <!-- Modals -->
+  <div id="conditions-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-blue-600">Conditions d'utilisation</h3>
+          <button onclick="toggleModal('conditions-modal')" class="text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="prose prose-blue max-w-none">
+          <p>En utilisant Promo-Plus, vous acceptez les conditions suivantes :</p>
+          <ul>
+            <li>Vous vous engagez à utiliser la plateforme uniquement dans le cadre de promotions réelles.</li>
+            <li>Aucun contenu frauduleux ou trompeur ne sera toléré.</li>
+            <li>Les entreprises sont responsables de la véracité des informations publiées.</li>
+            <li>Promo-Plus se réserve le droit de suspendre tout compte enfreignant ces conditions.</li>
+            <li>Les utilisateurs peuvent signaler les promotions suspectes pour examen.</li>
+            <li>La plateforme est un intermédiaire et n'est pas responsable des transactions entre clients et entreprises.</li>
+          </ul>
+          <p>Dernière mise à jour : 1er janvier 2023</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="privacy-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-blue-600">Politique de confidentialité</h3>
+          <button onclick="toggleModal('privacy-modal')" class="text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="prose prose-blue max-w-none">
+          <p>Votre vie privée est importante pour nous. Voici comment nous traitons vos données :</p>
+          <ul>
+            <li>Nous collectons uniquement les données nécessaires à votre inscription et à la gestion de vos offres.</li>
+            <li>Vos données personnelles ne seront jamais vendues ou partagées avec des tiers sans votre consentement.</li>
+            <li>Nous utilisons des mesures de sécurité appropriées pour protéger vos informations.</li>
+            <li>Vous pouvez demander à tout moment l'accès, la modification ou la suppression de vos données.</li>
+            <li>Nous utilisons des cookies pour améliorer votre expérience utilisateur, que vous pouvez désactiver.</li>
+            <li>Les données de localisation sont utilisées uniquement pour vous montrer les promotions pertinentes.</li>
+          </ul>
+          <p>Pour toute question concernant votre vie privée, contactez-nous à <a href="mailto:elmaniora1234@gmail.com" class="text-blue-600">elmaniora1234@gmail.com</a>.</p>
+          <p>Dernière mise à jour : 1er janvier 2023</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle modal visibility
+  function toggleModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.toggle('hidden');
+    document.body.style.overflow = modal.classList.contains('hidden') ? 'auto' : 'hidden';
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function(event) {
+    if (event.target.classList.contains('fixed')) {
+      const modals = document.querySelectorAll('.fixed');
+      modals.forEach(modal => {
+        if (!modal.classList.contains('hidden')) {
+          modal.classList.add('hidden');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    }
+  }
+
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Animation classes */
+  .animate-fade-in {
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Custom styles for the page */
+  .prose-blue a {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+
+  .prose-blue ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose-blue li {
+    margin-bottom: 0.5rem;
+  }
+</style>
+{% endblock %}

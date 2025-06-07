@@ -4,13 +4,20 @@
 {% block title %}Modifier Entreprise - Dashboard{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6">
-  <div class="max-w-4xl mx-auto">
-    <div class="flex items-center justify-between mb-8">
-      <h1 class="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-yellow-600">
-        Modifier les informations de l'entreprise
-      </h1>
-      <a href="{% url 'dashboard' %}" class="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-yellow-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block mr-2 -mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          Modifier les informations de l'entreprise
+        </h1>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Mettez à jour les détails de votre entreprise pour une meilleure visibilité</p>
+      </div>
+      <a href="{% url 'dashboard' %}" class="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
         </svg>
@@ -18,55 +25,97 @@
       </a>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-      <form method="post" enctype="multipart/form-data" class="p-6 space-y-6">
+    <!-- Main Form Container -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-10">
+      <form method="post" enctype="multipart/form-data" class="p-4 sm:p-6 space-y-8">
         {% csrf_token %}
         
-        <!-- Section Informations de base -->
-        <div class="space-y-6">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white border-b pb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2H5a1 1 0 010-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
-            </svg>
-            Informations de base
-          </h2>
+        <!-- Section 1: Basic Information -->
+        <div class="space-y-6 bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl">
+          <div class="flex items-center">
+            <div class="bg-purple-100 dark:bg-purple-900/50 p-2 rounded-lg mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              Informations de base
+            </h2>
+          </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nom -->
             <div>
-              <label for="{{ form.nom.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Nom de l'entreprise *
+              <label for="{{ form.nom.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+                <span>Nom de l'entreprise</span>
+                <span class="text-red-500 ml-1">*</span>
               </label>
-              {{ form.nom }}
+              <div class="relative">
+                {{ form.nom }}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
               {% if form.nom.errors %}
                 <p class="mt-1 text-sm text-red-600">{{ form.nom.errors.as_text }}</p>
               {% endif %}
             </div>
             
+            
+            <!-- Email -->
             <div>
-              <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Email *
+              <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+                <span>Email</span>
+                <span class="text-red-500 ml-1">*</span>
               </label>
-              {{ form.email }}
+              <div class="relative">
+                {{ form.email }}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                  </svg>
+                </div>
+              </div>
               {% if form.email.errors %}
                 <p class="mt-1 text-sm text-red-600">{{ form.email.errors.as_text }}</p>
               {% endif %}
             </div>
             
+            <!-- Contact -->
             <div>
-              <label for="{{ form.contact.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Téléphone *
+              <label for="{{ form.contact.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+                <span>Téléphone</span>
+                <span class="text-red-500 ml-1">*</span>
               </label>
-              {{ form.contact }}
+              <div class="relative">
+                {{ form.contact }}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  </svg>
+                </div>
+              </div>
               {% if form.contact.errors %}
                 <p class="mt-1 text-sm text-red-600">{{ form.contact.errors.as_text }}</p>
               {% endif %}
             </div>
             
-            <div>
+            <!-- Website -->
+            <div class="md:col-span-2">
               <label for="{{ form.website.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Site web
               </label>
-              {{ form.website }}
+              <div class="relative">
+                {{ form.website }}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
               {% if form.website.errors %}
                 <p class="mt-1 text-sm text-red-600">{{ form.website.errors.as_text }}</p>
               {% endif %}
@@ -74,34 +123,64 @@
           </div>
         </div>
         
-        <!-- Section Logo et Bannière -->
-        <div class="space-y-6 pt-6">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white border-b pb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-            </svg>
-            Images
-          </h2>
+        <!-- Section 2: Images -->
+        <div class="space-y-6 bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl">
+          <div class="flex items-center">
+            <div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              Images et visuels
+            </h2>
+          </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Logo -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Logo
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Logo de l'entreprise
+                <span class="text-xs text-gray-500 dark:text-gray-400 block">(Format carré recommandé, min. 256x256px)</span>
               </label>
-              <div class="flex items-center space-x-4">
-                {% if entreprise.logo %}
-                  <img src="{{ entreprise.logo.url }}" alt="Logo actuel" class="h-16 w-16 rounded-full object-cover border-2 border-gray-300">
-                {% else %}
-                  <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div class="relative">
+                  {% if entreprise.logo %}
+                    <img src="{{ entreprise.logo.url }}" alt="Logo actuel" class="h-24 w-24 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600 shadow-sm">
+                  {% else %}
+                    <div class="h-24 w-24 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center shadow-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  {% endif %}
+                  {% if entreprise.logo %}
+                    <button type="button" onclick="document.getElementById('logo-clear_id').click()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  {% endif %}
+                </div>
+                <div class="flex-1 w-full">
+                  <div class="flex items-center justify-center w-full">
+                    <label for="{{ form.logo.id_for_label }}" class="flex flex-col items-center justify-center w-full border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-colors py-4 px-2">
+                      <div class="flex flex-col items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500 dark:text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+                          <span class="font-semibold">Cliquez pour uploader</span><br>
+                          ou glissez-déposez votre logo
+                        </p>
+                      </div>
+                      {{ form.logo }}
+                    </label>
                   </div>
-                {% endif %}
-                <div class="flex-1">
-                  {{ form.logo }}
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Format carré recommandé (min. 256x256px)</p>
+                  <div class="flex items-center mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {{ form.logo.clear }}
+                    <label for="logo-clear_id" class="ml-2 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">Supprimer le logo actuel</label>
+                  </div>
                   {% if form.logo.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.logo.errors.as_text }}</p>
                   {% endif %}
@@ -111,22 +190,48 @@
             
             <!-- Bannière -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Bannière
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Bannière de l'entreprise
+                <span class="text-xs text-gray-500 dark:text-gray-400 block">(Format paysage recommandé, min. 1200x400px)</span>
               </label>
-              <div class="flex items-center space-x-4">
-                {% if entreprise.banniere %}
-                  <img src="{{ entreprise.banniere.url }}" alt="Bannière actuelle" class="h-16 w-24 object-cover rounded-lg border border-gray-300">
-                {% else %}
-                  <div class="h-16 w-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div class="relative">
+                  {% if entreprise.banniere %}
+                    <img src="{{ entreprise.banniere.url }}" alt="Bannière actuelle" class="h-24 w-36 object-cover rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+                  {% else %}
+                    <div class="h-24 w-36 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center shadow-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  {% endif %}
+                  {% if entreprise.banniere %}
+                    <button type="button" onclick="document.getElementById('banniere-clear_id').click()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  {% endif %}
+                </div>
+                <div class="flex-1 w-full">
+                  <div class="flex items-center justify-center w-full">
+                    <label for="{{ form.banniere.id_for_label }}" class="flex flex-col items-center justify-center w-full border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-colors py-4 px-2">
+                      <div class="flex flex-col items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500 dark:text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+                          <span class="font-semibold">Cliquez pour uploader</span><br>
+                          ou glissez-déposez votre bannière
+                        </p>
+                      </div>
+                      {{ form.banniere }}
+                    </label>
                   </div>
-                {% endif %}
-                <div class="flex-1">
-                  {{ form.banniere }}
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Format paysage recommandé (min. 1200x400px)</p>
+                  <div class="flex items-center mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {{ form.banniere.clear }}
+                    <label for="banniere-clear_id" class="ml-2 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">Supprimer la bannière actuelle</label>
+                  </div>
                   {% if form.banniere.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.banniere.errors.as_text }}</p>
                   {% endif %}
@@ -136,67 +241,147 @@
           </div>
         </div>
         
-        <!-- Section Localisation -->
-        <div class="space-y-6 pt-6">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white border-b pb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-            </svg>
-            Localisation
-          </h2>
-          
-          <div>
-            <label for="{{ form.localisation.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Adresse complète *
-            </label>
-            {{ form.localisation }}
-            {% if form.localisation.errors %}
-              <p class="mt-1 text-sm text-red-600">{{ form.localisation.errors.as_text }}</p>
-            {% endif %}
+        <!-- Section 3: Localisation -->
+        <div class="space-y-6 bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl">
+          <div class="flex items-center">
+            <div class="bg-green-100 dark:bg-green-900/50 p-2 rounded-lg mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              Localisation
+            </h2>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6">
+            <!-- Adresse textuelle -->
             <div>
-              <label for="{{ form.latitude.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Latitude *
+              <label for="{{ form.localisation.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+                <span>Adresse complète</span>
+                <span class="text-red-500 ml-1">*</span>
               </label>
-              {{ form.latitude }}
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Exemple: 14.6928 (pour Dakar)</p>
-              {% if form.latitude.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.latitude.errors.as_text }}</p>
+              <div class="relative">
+                {{ form.localisation }}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              {% if form.localisation.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.localisation.errors.as_text }}</p>
               {% endif %}
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Adresse textuelle qui sera affichée sur votre page</p>
             </div>
             
+            <!-- Localisation Maps -->
             <div>
-              <label for="{{ form.longitude.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Longitude *
+              <label for="{{ form.localisation_map.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Localisation pour Google Maps
               </label>
-              {{ form.longitude }}
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Exemple: -17.4467 (pour Dakar)</p>
-              {% if form.longitude.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ form.longitude.errors.as_text }}</p>
+              <div class="relative">
+                {{ form.localisation_map }}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              {% if form.localisation_map.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.localisation_map.errors.as_text }}</p>
               {% endif %}
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Nom exact de votre entreprise sur Google Maps ou coordonnées GPS (ex: "6.130419, 1.215829")</p>
             </div>
           </div>
         </div>
-        
-        <!-- Section Réseaux sociaux -->
-        <div class="space-y-6 pt-6">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white border-b pb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
-              <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
-            </svg>
-            Réseaux sociaux
-          </h2>
+        <!-- Section 4: Référencement amélioré -->
+<div class="space-y-6 bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl">
+  <div class="flex items-center">
+    <div class="bg-yellow-100 dark:bg-yellow-900/50 p-2 rounded-lg mr-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+      Optimisation SEO
+    </h2>
+  </div>
+  
+  <div class="grid grid-cols-1 gap-6">
+        <!-- Meta Description -->
+    <div>
+      <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Description de votre Entreprise
+      </label>
+      <textarea id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" 
+                maxlength="160" rows="3"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Description concise de votre page">{{ form.description.value|default:'' }}</textarea>
+      <div class="flex justify-between mt-1">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Ce texte apparait comme description</p>
+      </div>
+      {% if form.description.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.description.errors.as_text }}</p>
+      {% endif %}
+    </div>
+    
+    <!-- Meta Description -->
+    <div>
+      <label for="{{ form.meta_description.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Meta Description
+      </label>
+      <textarea id="{{ form.meta_description.id_for_label }}" name="{{ form.meta_description.name }}" 
+                maxlength="160" rows="3"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Description concise de votre page pour les résultats de recherche (150-160 caractères)">{{ form.meta_description.value|default:'' }}</textarea>
+      <div class="flex justify-between mt-1">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Ce texte apparaît sous le titre dans les résultats</p>
+        <span id="meta_desc_counter" class="text-xs text-gray-500 dark:text-gray-400">0/160</span>
+      </div>
+      {% if form.meta_description.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.meta_description.errors.as_text }}</p>
+      {% endif %}
+    </div>
+    
+    <!-- Mots-clés -->
+    <div>
+      <label for="{{ form.meta_keywords.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Mots-clés SEO
+      </label>
+      <input type="text" id="{{ form.meta_keywords.id_for_label }}" name="{{ form.meta_keywords.name }}"
+             value="{{ form.meta_keywords.value|default:'' }}"
+             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+             placeholder="mots-clés, séparés, par, des, virgules">
+      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Liste de mots-clés pertinents séparés par des virgules (max 10 mots-clés)</p>
+      {% if form.meta_keywords.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.meta_keywords.errors.as_text }}</p>
+      {% endif %}
+    </div>
+    </div>
+
+        <!-- Section 5: Réseaux sociaux -->
+        <div class="space-y-6 bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl">
+          <div class="flex items-center">
+            <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-lg mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              Réseaux sociaux
+            </h2>
+          </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Facebook -->
             <div>
               <label for="{{ form.facebook.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Facebook
               </label>
               <div class="flex">
-                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
                   </svg>
@@ -208,12 +393,14 @@
               {% endif %}
             </div>
             
+            <!-- Instagram -->
             <div>
+              
               <label for="{{ form.instagram.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Instagram
               </label>
               <div class="flex">
-                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" />
                   </svg>
@@ -225,12 +412,13 @@
               {% endif %}
             </div>
             
+            <!-- Twitter -->
             <div>
               <label for="{{ form.twitter.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Twitter
+                Twitter (X)
               </label>
               <div class="flex">
-                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                   </svg>
@@ -243,9 +431,16 @@
             </div>
           </div>
         </div>
-        
-        <div class="pt-6">
-          <button type="submit" class="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all hover:from-purple-700 hover:to-blue-700">
+
+        <!-- Submit Button Section -->
+        <div class="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <a href="{% url 'dashboard' %}" class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-center">
+            Annuler
+          </a>
+          <button type="submit" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all hover:from-purple-700 hover:to-blue-700 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
             Enregistrer les modifications
           </button>
         </div>
@@ -254,6 +449,7 @@
   </div>
 </div>
 
+<!-- Custom Styles -->
 <style>
   .text-gradient {
     background-clip: text;
@@ -261,14 +457,19 @@
     -webkit-text-fill-color: transparent;
   }
   
-  input, textarea, select {
-    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500;
+  /* Form inputs styling */
+  input:not([type=file]):not([type=checkbox]), 
+  textarea, 
+  select {
+    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all;
   }
   
+  /* File inputs */
   input[type="file"] {
-    @apply border-0 p-0 bg-transparent;
+    @apply hidden;
   }
   
+  /* Social media inputs */
   .flex .rounded-r-md {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -278,5 +479,106 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+  
+  /* Textarea styling */
+  textarea {
+    min-height: 100px;
+    @apply resize-y;
+  }
+  
+  /* Checkbox styling */
+  input[type="checkbox"] {
+    @apply h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-gray-600 rounded;
+  }
+  
+  /* Drag and drop area */
+  [type="file"] + label {
+    @apply transition-colors duration-200;
+  }
+  
+  [type="file"]:focus + label,
+  [type="file"] + label:hover {
+    @apply border-purple-500 dark:border-purple-400;
+  }
 </style>
+
+<!-- Script for file upload preview -->
+<script>
+  // Preview logo when selected
+  document.getElementById('{{ form.logo.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        document.querySelector('.logo-preview').src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  // Preview banner when selected
+  document.getElementById('{{ form.banniere.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        document.querySelector('.banner-preview').src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+
+
+  
+</script>
+
+
+
+
+<!-- Scripts améliorés pour le référencement -->
+<script>
+  // Compteur de caractères pour le SEO
+  document.addEventListener('DOMContentLoaded', function() {
+    // Meta Title counter
+    
+    // Meta Description counter
+    const metaDesc = document.getElementById('{{ form.meta_description.id_for_label }}');
+    const metaDescCounter = document.getElementById('meta_desc_counter');
+    if (metaDesc && metaDescCounter) {
+      metaDesc.addEventListener('input', function() {
+        metaDescCounter.textContent = `${this.value.length}/160`;
+        if (this.value.length > 160) {
+          metaDescCounter.classList.add('text-red-500');
+        } else {
+          metaDescCounter.classList.remove('text-red-500');
+        }
+      });
+      // Trigger on load
+      metaDesc.dispatchEvent(new Event('input'));
+    }
+
+    
+  });
+
+  // Preview logo and banner
+  function previewImage(input, previewClass) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.querySelector(previewClass).src = e.target.result;
+        document.querySelector(previewClass).classList.remove('hidden');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  document.getElementById('{{ form.logo.id_for_label }}').addEventListener('change', function() {
+    previewImage(this, '.logo-preview');
+  });
+
+  document.getElementById('{{ form.banniere.id_for_label }}').addEventListener('change', function() {
+    previewImage(this, '.banner-preview');
+  });
+</script>
 {% endblock %}

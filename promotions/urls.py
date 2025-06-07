@@ -60,6 +60,12 @@ urlpatterns = [
     #path('api/promotions/<int:pk>/', views.PromotionRetrieveUpdateDestroy.as_view(), name='promotion-retrieve-update-destroy'),
     path('profile/', views.profile, name='profile'),
     path('demande-inscription/', views.demande_inscription, name='demande_inscription'),
+    path('images/add/', views.add_entreprise_image, name='add_entreprise_image'),
+    path('images/delete/<int:pk>/', views.delete_entreprise_image, name='delete_entreprise_image'),
+
+    # Gestion abonnés
+    #path('abonnes/add/', login_required(views.add_abonne), name='add_abonne'),
+    #path('abonnes/delete/<int:pk>/', login_required(views.delete_abonne), name='delete_abonne'),
 
     # Vue publique
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -88,6 +94,10 @@ urlpatterns = [
     path('promotions-actives/', views.promotions_actives, name='promotions_actives'),
     # Export des données
     path('export/', views.export_data, name='export_data'),
+    path('about_me/',views.propos,name='propos_view'),
+    path('api/abonnement-email/<int:entreprise_id>/', views.abonnement_par_entreprise, name='abonnement_email'),
+    path('api/confirmer-code/', views.confirmer_code_verification, name='confirmer_code'),
+    path('api/promo-notif/<int:entreprise_id>/', views.check_promo_notification, name='check_promo_notification'),
 
 
 
@@ -127,20 +137,6 @@ urlpatterns = [
     path('admin-dashboard/entreprises/<int:entreprise_id>/edit/', views.admin_edit_entreprise, name='admin_edit_entreprise'),
     path('admin-dashboard/entreprises/<int:entreprise_id>/delete/', views.admin_delete_entreprise, name='admin_delete_entreprise'),
     path('admin-dashboard/promotions/', views.admin_promotion_management, name='admin_promotion_management'),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ]

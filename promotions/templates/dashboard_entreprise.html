@@ -23,6 +23,7 @@
       </div>
     </div>
     <div class="flex flex-wrap gap-3 justify-center">
+    
       <a href="{% url 'entreprise_public_view' entreprise.id %}" 
          class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all hover:shadow-xl hover:-translate-y-1">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -40,7 +41,10 @@
         Générer QR Code
       </button>
     </div>
+    
   </header>
+  
+
 
   <!-- Stats Summary Cards with Animation -->
   <div id="stats-summary" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 opacity-0">
@@ -116,7 +120,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Main Container -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Enhanced Company Information Section -->
@@ -350,6 +354,63 @@
     <div class="lg:col-span-2">
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <!-- ✅ Bouton d'ouverture -->
+<button onclick="toggleGalerieModal()" class="bg-purple-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition">
+  📸 Voir la galerie
+</button>
+
+<!-- ✅ Modal galerie -->
+<div id="galerie-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+  <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-xl transition-colors duration-300 p-6 md:p-8 relative">
+    
+    <!-- ✖️ Bouton de fermeture -->
+    <button onclick="toggleGalerieModal()" class="absolute top-4 right-4 text-gray-600 dark:text-gray-300 text-xl hover:text-red-500 transition">
+      &times;
+    </button>
+
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-extrabold text-purple-800 dark:text-purple-100 flex items-center gap-2">
+        📸 Galerie d'Entreprise
+      </h2>
+      <a href="{% url 'add_entreprise_image' %}" class="bg-yellow-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        Ajouter une image
+      </a>
+    </div>
+
+    {% if images %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for image in images %}
+          <div class="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <img src="{{ image.image.url }}" alt="{{ image.description }}" class="w-full h-60 object-cover">
+
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-2 text-sm text-white">
+              {{ image.description|default:"(Sans description)" }}
+            </div>
+
+            <form method="post" action="{% url 'delete_entreprise_image' image.pk %}" class="absolute top-2 right-2">
+              {% csrf_token %}
+              <button type="submit" class="bg-red-600 text-white w-9 h-9 rounded-full shadow hover:bg-red-700 transition flex items-center justify-center">
+                🗑
+              </button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-600 dark:text-gray-300 text-center italic">Aucune image ajoutée pour le moment.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ✅ Script JS simple -->
+<script>
+  function toggleGalerieModal() {
+    const modal = document.getElementById('galerie-modal');
+    modal.classList.toggle('hidden');
+    modal.classList.toggle('flex');
+  }
+</script>
+
           <h2 class="text-2xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-yellow-600">
             Gestion des Promotions
           </h2>
@@ -475,6 +536,7 @@
             {% endfor %}
           </tbody>
         </table>
+        
       </div>
 
       <!-- Card View (hidden by default) -->
@@ -821,6 +883,7 @@
     </form>
   </div>
 </div>
+</div></div></div>
 
 <!-- Include QR Code library -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
@@ -1677,5 +1740,119 @@ function closeFAQModal() {
     @apply shadow-lg dark:bg-gray-800;
   }
 </style>
+<!-- ======================== SCRIPT JS GLOBAUX ======================== -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script>
+// Gestion de tous les modals (ouvrir/fermer dynamiquement)
+function toggleModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.classList.toggle('hidden');
+        modal.scrollTop = 0; // Scroll top auto
+    }
+}
+
+// Toast de notification
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-5 right-5 z-50 text-white px-4 py-2 rounded shadow-md animate-fade-in-out ${type === 'error' ? 'bg-red-600' : 'bg-green-600'}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+// AJAX pour soumission des formulaires (générique)
+function submitAjaxForm(formId, endpoint, callback) {
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch(endpoint, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || "Action réussie !");
+            if (callback) callback();
+        } else {
+            showToast(data.error || "Erreur", "error");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        showToast("Erreur serveur", "error");
+    });
+}
+
+// Carte interactive avec Leaflet pour mise à jour localisation_map
+function initMap(lat = 6.13, lng = 1.22) {
+    const map = L.map('map-canvas').setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+    }).addTo(map);
+
+    let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+    marker.on('dragend', function(e) {
+        const { lat, lng } = e.target.getLatLng();
+        document.getElementById('location_map_input').value = lat.toFixed(6) + "," + lng.toFixed(6);
+        showToast("Coordonnées mises à jour");
+    });
+
+    map.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        document.getElementById('location_map_input').value = lat.toFixed(6) + "," + lng.toFixed(6);
+        showToast("Nouvel emplacement sélectionné");
+    });
+}
+
+// Initialiser tous les composants au chargement
+document.addEventListener("DOMContentLoaded", function () {
+    // Toast automatique d'exemple
+    if (localStorage.getItem('promo_toast_shown') !== '1') {
+        showToast("Bienvenue sur votre tableau de bord !");
+        localStorage.setItem('promo_toast_shown', '1');
+    }
+
+    // Si modal carte existe, init map
+    if (document.getElementById('map-canvas')) {
+        initMap();
+    }
+});
+</script>
+
+<style>
+@keyframes fade-in-out {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+.animate-fade-in-out {
+  animation: fade-in-out 5s ease-in-out forwards;
+}
+</style>
+
+<!-- Modal édition localisation dynamique -->
+<div id="editLocationModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50 overflow-auto">
+  <div class="bg-white rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+    <button onclick="toggleModal('editLocationModal')" class="absolute top-2 right-2 text-gray-500 text-2xl">&times;</button>
+    <h3 class="text-xl font-bold mb-4">Modifier la localisation</h3>
+    <div id="map-canvas" class="w-full h-96 mb-4 rounded shadow"></div>
+    <form id="location-form" onsubmit="event.preventDefault(); submitAjaxForm('location-form', '/entreprise/modifier/', () => toggleModal('editLocationModal'))">
+        {% csrf_token %}
+        <label for="location_map_input" class="block mb-2 font-medium">Coordonnées sélectionnées :</label>
+        <input type="text" id="location_map_input" name="localisation_map" value="{{ entreprise.localisation_map }}" class="w-full border px-3 py-2 rounded mb-4">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Sauvegarder</button>
+    </form>
+  </div>
+</div>
 
 {% endblock %}

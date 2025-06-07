@@ -7,9 +7,132 @@
     {% load static %}
     <!-- Favicon -->
     <link rel="icon" href="{% static 'favicon.ico' %}">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block seo %}
+    {% if entreprise %}
+    <meta name="description" content="{{ entreprise.meta_description|default:entreprise.description|truncatechars:160 }}">
+    <meta name="keywords" content="{{ entreprise.meta_keywords|default:'' }}">
+    <meta property="og:title" content="{{ entreprise.nom }} - Promotions sur Promo-Plus">
+    <meta property="og:description" content="{{ entreprise.description|truncatechars:300 }}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ entreprise.logo.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    {% endif %}
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .modal-scrollable {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<Script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleDarkMode = document.getElementById('toggle-dark-mode');
+  
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const storedTheme = localStorage.getItem('theme');
+
+  function applyTheme(isDark) {
+    if (isDark) {
+      document.documentElement.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  }
+
+  if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+    applyTheme(true);
+  } else {
+    applyTheme(false);
+  }
+
+  if (toggleDarkMode) {
+    toggleDarkMode.addEventListener('click', function () {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      document.documentElement.style.transition = 'background-color 0.5s ease, color 0.5s ease';
+    });
+  }
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) {
+      applyTheme(e.matches);
+    }
+  });
+});
+
+</script>
+  
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .modal-scrollable {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  /* TON STYLE NUIT PERSONNALISÉ UNIQUEMENT EN MODE NUIT */
+  .dark-mode body {
+    font-family: 'Inter', sans-serif;
+    background-color: #111827; /* ou autre couleur plus sombre */
+    color:rgb(135, 63, 113);
+  }
+
+  .dark-mode .modal-scrollable {
+    background-color: #1f2937;
+    color:rgb(255, 255, 255);
+  }
+
+  .dark-mode header,
+  .dark-mode footer {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+  }
+
+  .dark-mode a {
+    color:rgb(68, 87, 110);
+  }
+
+  .dark-mode a:hover {
+    color:rgb(79, 105, 138);
+  }
+
+  .dark-mode .card {
+    background-color: #1e293b;
+    border-color: #334155;
+  }
+</style>
+
+{% endblock %}
     <style>
+
         /* Animations futuristes */
         .fade-in {
             opacity: 0;
@@ -354,7 +477,7 @@
     <!-- Header futuriste -->
     <header class="fixed top-0 w-full z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="/" class="fas fa-gift mr-3 text-2xl font-bold logo-gradient">    PromoSite</a>
+            <a href="/" class="fas fa-gift mr-3 text-2xl font-bold logo-gradient">    Promo+</a>
             
             <!-- Navigation desktop futuriste -->
             <div class="hidden md:flex items-center space-x-8">
@@ -362,7 +485,7 @@
                 <a href="/promotions-actives" class="nav-link">Promotions en cours</a>
                 <a href="/archives" class="nav-link">Archives</a>
                 <a href="/entreprise" class="nav-link">Entreprises</a>
-
+                
                 
                 {% if user.is_authenticated %}
                 <!-- Menu utilisateur futuriste -->
@@ -398,7 +521,6 @@
                 <a href="/demande-inscription" class="nav-link">Inscription</a>
                 <a href="{% url 'login' %}" class="nav-link">Connexion</a>
                 {% endif %}
-                
                 <button id="toggle-dark-mode" class="ml-4 focus:outline-none">
                     <div id="toggle-dark-mode-inner"></div>
                 </button>
@@ -471,12 +593,13 @@
                     Connexion
                 </a>
                 {% endif %}
+                <button id="toggle-dark-mode" class="ml-4 focus:outline-none">
+                    <div id="toggle-dark-mode-inner"></div>
+                </button>
             </div>
+            
         </div>
     </header>
-
-    <!-- Overlay futuriste -->
-    <div id="mobile-overlay" class="mobile-overlay"></div>
 
     <!-- Contenu principal -->
     <main class="container mx-auto px-4 pt-24 pb-20 md:pt-28 md:pb-16">
@@ -487,13 +610,26 @@
     <!-- Footer futuriste -->
     <footer class="fixed bottom-0 w-full z-40">
         <div class="container mx-auto text-center py-3">
-            <p class="text-sm">&copy; 2025 PromoSite. Tous droits réservés.&copy; team_wfm_of_life</p>
+            <p class="text-sm">&copy; Product by Team WFM of Life</p>
         </div>
         
     </footer>
 
     <!-- Scripts JavaScript futuristes -->
     <script>
+
+
+
+
+
+
+
+
+
+
+
+
+
         // Gestion du menu utilisateur futuriste
         const userMenuButton = document.getElementById('user-menu-button');
         const userMenu = document.getElementById('user-menu');

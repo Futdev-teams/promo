@@ -12,6 +12,9 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.urls import reverse
 
+from django.db import models
+from django.urls import reverse
+
 class Entreprise(models.Model):
     nom = models.CharField(max_length=100)
     categorie_e = models.CharField(max_length=50, choices=[
@@ -20,26 +23,49 @@ class Entreprise(models.Model):
         ('hôpital', 'Hôpital'),
         ('magasin', 'Magasin'),
         ('réseau', 'Réseau'),
-    ],default="Supermarché")
+    ], default="Supermarché")
     email = models.EmailField()
-    description = models.TextField(default="Soyez à l'afflux de nos meilleurs promos ")
+    description = models.TextField(default="Soyez à l'afflux de nos meilleurs promos")
     contact = models.CharField(max_length=20)
     logo = models.ImageField(upload_to='logos/')
     banniere = models.ImageField(upload_to='bannieres/')
-    localisation = models.CharField(max_length=255)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    localisation = models.CharField(max_length=255, help_text="Adresse textuelle pour l'affichage")
+    localisation_map = models.TextField(help_text="Texte pour l'iframe Google Maps (ex: '6.1234,1.5678' ou 'Nom+du+lieu')")
+    latitude = models.FloatField(blank=True, null=True,default=0)
+    longitude = models.FloatField(blank=True, null=True,default=0)
     facebook = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
     twitter = models.URLField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
+    meta_description = models.TextField(blank=True, null=True, help_text="Description pour le référencement SEO")
+    meta_keywords = models.CharField(max_length=255, blank=True, null=True, help_text="Mots-clés pour le référencement SEO, séparés par des virgules")
+    
+    # Statistiques d'abonnés
+    abonnes_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.nom
     
     def get_absolute_url(self):
         return reverse('entreprise_public_view', kwargs={'entreprise_id': self.id})
+    
+    def get_map_url(self):
+        """Génère l'URL Google Maps à partir de localisation_map"""
+        if ',' in self.localisation_map:
+            # Si c'est des coordonnées lat,long
+            return f"https://maps.google.com/maps?q={self.localisation_map}&z=15&output=embed"
+        else:
+            # Si c'est une adresse textuelle
+            return f"https://maps.google.com/maps?q={self.localisation_map.replace(' ', '+')}&z=15&output=embed"
+    
+    def update_coordinates(self):
+        """Méthode pour mettre à jour latitude/longitude à partir de localisation_map"""
+        # Ici vous pourriez intégrer une API Google Maps pour géocoder l'adresse
+        pass
 
+    class Meta:
+        verbose_name = "Entreprise"
+        verbose_name_plural = "Entreprises"
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -255,3 +281,25 @@ class ActivityLog(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.action} - {self.timestamp}"
+  
+
+# models.py
+from django.db import models
+from django.core.validators import validate_email
+
+class EmailAbonne(models.Model):
+    email = models.EmailField(unique=True, validators=[validate_email])
+    code_verification = models.CharField(max_length=6)
+    est_verifie = models.BooleanField(default=False)
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
+class AbonnementEntreprise(models.Model):
+    email = models.ForeignKey(EmailAbonne, on_delete=models.CASCADE)
+    entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE)
+    date_abonnement = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('email', 'entreprise')

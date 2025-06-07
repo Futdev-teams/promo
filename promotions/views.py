@@ -1082,7 +1082,7 @@ def delete_faq(request, pk):
         return redirect('dashboard_entreprise')
     
     return render(request, 'delete_faq.html', {'faq': faq})
-
+"""
 @login_required
 def add_entreprise_image(request):
     entreprise = request.user.entreprise
@@ -1110,6 +1110,7 @@ def delete_entreprise_image(request, pk):
     
     return render(request, 'delete_image.html', {'image': image})
 
+"""
 # API Views
 @login_required
 @require_http_methods(["POST"])
@@ -1198,6 +1199,7 @@ def dashboard(request):
     produits = Produit.objects.filter(entreprise=entreprise)
     produits_actifs = produits.filter(date_fin_promo__gte=timezone.now(), est_expire=False)
     produits_expires = produits.filter(est_expire=True)
+    images = ImageEntreprise.objects.filter(entreprise=entreprise)
     
     # Calcul de la moyenne des réductions
     # Calcul de la moyenne des réductions
@@ -1213,7 +1215,8 @@ def dashboard(request):
         'produits_expires': produits_expires,
         'moyenne_reduction': moyenne_reduction,
         'jours_semaine': HoraireOuverture.JOURS_SEMAINE,
-        'horaires': {h.jour: h for h in entreprise.horaires_ouverture.all()}
+        'horaires': {h.jour: h for h in entreprise.horaires_ouverture.all()},
+        'images': images,
     }
     
     return render(request, 'dashboard_entreprise.html', context)
@@ -1472,6 +1475,150 @@ def export_data(request):
     }
     
     return JsonResponse(data)
+
+
+
+
+
+
+
+def propos(request):
+    return render(request, 'propos.html')
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from .models import EmailAbonne, AbonnementEntreprise, Entreprise
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+
+@csrf_exempt
+def abonnement_par_entreprise(request, entreprise_id):
+    if request.body == b'':
+        return JsonResponse({'success': False, 'error': 'Corps de requête vide'}, status=400)
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        email = data.get('email')
+        if not email:
+            return JsonResponse({'success': False, 'error': 'Email manquant'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Erreur JSON : {str(e)}'}, status=400)
+
+    try:
+        entreprise = Entreprise.objects.get(pk=entreprise_id)
+    except Entreprise.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Entreprise introuvable'}, status=404)
+
+    if request.method == 'POST':
+        code = str(random.randint(100000, 999999))
+        abonne, _ = EmailAbonne.objects.update_or_create(
+            email=email,
+            defaults={'code_verification': code, 'est_verifie': False}
+        )
+        AbonnementEntreprise.objects.get_or_create(email=abonne, entreprise=entreprise)
+
+        send_mail(
+            'Votre code de vérification Promo-Plus',
+            f'Votre code est : {code}',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
+
+        entreprise.abonnes_count = AbonnementEntreprise.objects.filter(entreprise=entreprise).count()
+        entreprise.save()
+
+        return JsonResponse({'success': True, 'abonnes_count': entreprise.abonnes_count})
+
+    elif request.method == 'DELETE':
+        try:
+            abonne = EmailAbonne.objects.get(email=email)
+            AbonnementEntreprise.objects.filter(email=abonne, entreprise=entreprise).delete()
+            entreprise.abonnes_count = AbonnementEntreprise.objects.filter(entreprise=entreprise).count()
+            entreprise.save()
+            return JsonResponse({'success': True, 'abonnes_count': entreprise.abonnes_count})
+        except EmailAbonne.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Email introuvable'}, status=404)
+
+    return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def confirmer_code_verification(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            code = data.get('code')
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': f'Erreur JSON : {str(e)}'}, status=400)
+
+        try:
+            abonne = EmailAbonne.objects.get(email=email)
+        except EmailAbonne.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Email non trouvé'}, status=404)
+
+        if abonne.code_verification == code:
+            abonne.est_verifie = True
+            abonne.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'Code incorrect'}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+
+
+from django.utils.timezone import now
+from django.views.decorators.csrf import csrf_exempt
+from .models import EmailAbonne, AbonnementEntreprise, Produit, Entreprise
+from django.http import JsonResponse
+import json
+
+@csrf_exempt
+def check_promo_notification(request, entreprise_id):
+    try:
+        data = json.loads(request.body)
+        email = data.get("email")
+        if not email:
+            return JsonResponse({'success': False, 'error': 'Email requis'}, status=400)
+
+        entreprise = Entreprise.objects.get(id=entreprise_id)
+        derniere_promo = Produit.objects.filter(entreprise=entreprise).order_by('-date_debut_promo').first()
+
+        if not derniere_promo:
+            return JsonResponse({'nouvelle': False})
+
+        is_abonne = AbonnementEntreprise.objects.filter(
+            entreprise=entreprise,
+            email__email=email,
+            email__est_verifie=True
+        ).exists()
+
+        return JsonResponse({
+            'nouvelle': True,
+            'produit': derniere_promo.nom,
+            'date': derniere_promo.date_debut_promo.isoformat(),
+            'abonne': is_abonne
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

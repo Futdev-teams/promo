@@ -4,6 +4,47 @@
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+
+    <!-- Overlay futuriste -->
+    <div id="mobile-overlay" class="mobile-overlay"></div>
+    
+<!-- Email Popup -->
+<div id="email-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full relative">
+        <!-- Bouton de fermeture -->
+        <button onclick="closeEmailPopup()" class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl font-bold">
+            &times;
+        </button>
+
+        <h3 class="text-xl font-bold mb-4">Recevez les meilleures promotions</h3>
+
+        <!-- Formulaire email -->
+        <form id="email-form">
+            <input type="email" id="user-email" placeholder="Votre email" 
+                   class="w-full px-4 py-2 border rounded-lg mb-3" required>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                Valider
+            </button>
+        </form>
+
+        <!-- Message succès -->
+        <div id="email-success" class="hidden mt-3 text-green-600">
+            Merci ! Un code de vérification a été envoyé à votre email.
+        </div>
+
+        <!-- Section code de vérification (INTÉGRÉ DANS LE POPUP) -->
+        <div id="verification-section" class="hidden mt-4">
+            <input type="text" id="verification-code" placeholder="Entrez le code reçu par email"
+                class="w-full px-4 py-2 border rounded-lg mb-3">
+            <button onclick="verifierCode()" type="button"
+                class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                Vérifier le code
+            </button>
+        </div>
+    </div>
+</div>
+
+
 {% if messages %}
 <div class="fixed top-4 right-4 z-50 space-y-2">
     {% for message in messages %}
@@ -15,6 +56,77 @@
     {% endfor %}
 </div>
 {% endif %}
+<script>
+  // Ouvrir le popup quand on clique sur s'abonner
+function showEmailPopup() {
+    document.getElementById('email-popup').classList.remove('hidden');
+}
+
+// Envoyer l'email
+document.getElementById('email-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('user-email').value;
+    const entrepriseId = "{{ entreprise.id }}";
+
+    fetch(`/api/abonnement-email/${entrepriseId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Erreur serveur");
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            localStorage.setItem('abonne_email', email);
+            document.getElementById('verification-section').classList.remove('hidden');
+            alert("Un code de vérification a été envoyé à votre email.");
+        }
+    })
+    .catch(err => {
+        console.error("Erreur:", err);
+        alert("Erreur d'envoi d'email.");
+    });
+});
+
+function closeEmailPopup() {
+    document.getElementById('email-popup').classList.add('hidden');
+}
+
+
+
+function verifierCode() {
+    const email = document.getElementById('user-email').value;
+    const code = document.getElementById('verification-code').value;
+
+    fetch('/api/confirmer-code/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email, code: code })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Email confirmé avec succès !");
+            closeEmailPopup();
+        } else {
+            alert("Code incorrect : " + (data.error || ""));
+        }
+    })
+    .catch(err => {
+        alert("Erreur serveur lors de la vérification.");
+        console.error(err);
+    });
+}
+
+</script>
    <!-- Bannière -->
     <div class="relative h-80 w-full overflow-hidden shadow-xl">
         {% if entreprise.banniere %}
@@ -46,7 +158,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span class="text-white/90 text-lg">{{ entreprise.localisation }}</span>
+                                <span class="text-purple/90 text-lg">{{ entreprise.localisation }}</span>
                             </div>
                         </div>
                     </div>
@@ -64,17 +176,96 @@
                             </svg>
                             WhatsApp
                         </a>
-                        <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation|urlencode }}" target="_blank" class="px-5 py-2 bg-blue-500 text-white font-medium rounded-full flex items-center hover:bg-blue-600 transition-all">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation_map|urlencode }}" target="_blank" class="px-5 py-2 bg-blue-500 text-white font-medium rounded-full flex items-center hover:bg-blue-600 transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
                             Itinéraire
                         </a>
+                        <!-- Bouton Ajouter à l'écran d'accueil -->
+                        <button onclick="addToHomeScreen('{{ entreprise.nom }}', '{{ entreprise.get_absolute_url }}', '{{ entreprise.logo.url }}')" 
+                                class="px-5 py-2 bg-indigo-600 text-white font-medium rounded-full flex items-center hover:bg-indigo-700 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            Ajouter à l'accueil
+                        </button>
+                        
+                        <!-- Bouton S'abonner -->
+                        <!-- Bouton S'abonner -->
+                        <button onclick="toggleSubscription('{{ entreprise.id }}')" 
+                                id="subscribe-btn"
+                                class="px-5 py-2 {% if user_has_subscribed %}bg-green-600 hover:bg-green-700{% else %}bg-gray-600 hover:bg-gray-700{% endif %} text-white font-medium rounded-full flex items-center transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            {% if user_has_subscribed %}Abonné{% else %}S'abonner{% endif %} ({{ entreprise.abonnes_count }})
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+<script>
+const entrepriseId = "{{ entreprise.id }}";
+const email = localStorage.getItem('abonne_email');
+
+if (email) {
+    fetch(`/api/promo-notif/${entrepriseId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.nouvelle && data.produit) {
+            const key = `last_promo_${entrepriseId}`;
+            const lastSeen = localStorage.getItem(key);
+            const now = new Date();
+            const promoDate = new Date(data.date);
+
+            if (data.abonne) {
+                // Toujours notifié s'il est abonné
+                if (!lastSeen || new Date(lastSeen) < promoDate) {
+                    afficherToast(`Nouvelle promo : ${data.produit}`);
+                    localStorage.setItem(key, now.toISOString());
+                }
+            } else {
+                // Pas abonné → seulement 1 fois tous les 3 jours
+                const threeDays = 3 * 24 * 60 * 60 * 1000;
+                if (!lastSeen || now - new Date(lastSeen) > threeDays) {
+                    afficherToast(`${data.produit} - promo chez ${document.title}`);
+                    localStorage.setItem(key, now.toISOString());
+                }
+            }
+        }
+    })
+    .catch(err => console.error("Erreur toast promo:", err));
+}
+
+function afficherToast(texte) {
+    const notif = document.createElement('div');
+    notif.className = 'fixed top-5 right-5 bg-indigo-600 text-white px-4 py-2 rounded shadow z-50 animate-fade-in-out';
+    notif.innerText = texte;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 6000);
+}
+</script>
+
+<style>
+@keyframes fade-in-out {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+.animate-fade-in-out {
+  animation: fade-in-out 5s ease-in-out forwards;
+}
+</style>
 
     <!-- Contenu principal -->
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-16 relative z-10">
@@ -150,9 +341,9 @@
                                 <div>
                                     <h3 class="font-semibold text-gray-900 dark:text-white">Localisation</h3>
                                     <p class="text-gray-600 dark:text-gray-400 mt-1">
-                                        {{ entreprise.localisation}}
+                                        {{ entreprise.localisation_map}}
                                     </p>
-                                    <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation|urlencode }}" target="_blank" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-1 inline-flex items-center">
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation_map|urlencode }}" target="_blank" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-1 inline-flex items-center">
                                         Voir sur Maps
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -214,6 +405,8 @@
                     </div>
                     <div class="h-64 md:h-full bg-gray-200 dark:bg-gray-700 relative">
                         <!-- Intégration de Google Maps avec options d'ouverture -->
+                         <!-- Intégration de Google Maps avec localisation_map -->
+                    <!-- Intégration de Google Maps avec options d'ouverture -->
                         <iframe 
                             width="100%" 
                             height="100%" 
@@ -221,26 +414,73 @@
                             scrolling="no" 
                             marginheight="0" 
                             marginwidth="0" 
-                            src="https://maps.google.com/maps?q={{ entreprise.localisation|urlencode }}&z=15&output=embed"
+                            src="https://maps.google.com/maps?q={{ entreprise.localisation_map|urlencode }}&z=15&output=embed"
                             class="absolute inset-0"
                             allowfullscreen>
                         </iframe>
-                        <div class="absolute bottom-4 left-4 right-4 flex gap-2">
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ entreprise.localisation|urlencode }}" 
+                        <div class="absolute bottom-10 left-4 right-4 flex gap-2">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ entreprise.localisation_map|urlencode }}" 
                                target="_blank"
                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg transition-colors text-sm">
                                 Itinéraire
                             </a>
-                            <a href="geo:0,0?q={{ entreprise.localisation|urlencode }}"
+                            <a href="geo:0,0?q={{ entreprise.localisation_map|urlencode }}"
                                class="flex-1 bg-gray-800 hover:bg-gray-900 text-white text-center py-2 px-4 rounded-lg transition-colors text-sm">
                                 Ouvrir dans Maps
                             </a>
+    
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+<script>
 
+// Fonction pour ajouter à l'écran d'accueil
+function addToHomeScreen(entrepriseNom, url, logoUrl) {
+    if ('serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window) {
+        // Implémentation PWA pour installation
+        // Vous pouvez stocker ces infos dans localStorage pour un accès rapide
+        localStorage.setItem(`home_${entrepriseNom}`, JSON.stringify({
+            url: url,
+            logo: logoUrl,
+            name: entrepriseNom
+        }));
+        
+        // Afficher une notification de succès
+        alert(`${entrepriseNom} a été ajouté à votre écran d'accueil !`);
+    } else {
+        // Solution de repli pour les navigateurs non PWA
+        if (confirm(`Voulez-vous ajouter un raccourci vers ${entrepriseNom} sur votre écran d'accueil ?`)) {
+            // Créer un favori avec un icône
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('data-pinned-tab-title', entrepriseNom);
+            link.setAttribute('data-pinned-tab-icon', logoUrl);
+            document.body.appendChild(link);
+            alert(`Ouvrez ce lien dans Safari (iOS) ou Chrome (Android) et utilisez l'option "Ajouter à l'écran d'accueil"`);
+        }
+    }
+}
+
+
+// Fonction pour partager l'entreprise
+function shareEnterprise() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Découvrez {{ entreprise.nom }} sur Promo-Plus',
+            text: 'Retrouvez toutes les promotions de {{ entreprise.nom }} sur Promo-Plus',
+            url: window.location.href
+        })
+        .catch(err => console.log('Erreur de partage:', err));
+    } else {
+        // Solution de repli
+        const shareUrl = `whatsapp://send?text=Découvrez ${encodeURIComponent(entreprise.nom)} sur Promo-Plus: ${window.location.href}`;
+        window.open(shareUrl, '_blank');
+    }
+}
+
+</script>
         <!-- Promotions avec filtres -->
         <div class="mb-12">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -562,6 +802,44 @@
         {% endif %}
     </div>
 </div>
+<script>
+function toggleSubscription(entrepriseId) {
+    const btn = document.getElementById('subscribe-btn');
+    const isSubscribed = btn.classList.contains('bg-green-600');
+
+    // S'il est déjà abonné, on propose de se désabonner
+    if (isSubscribed) {
+        const email = prompt("Entrez votre email pour vous désabonner:");
+        if (!email) return;
+
+        fetch(`/api/abonnement-email/${entrepriseId}/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                btn.innerHTML = `S'abonner (${data.abonnes_count})`;
+                alert("Désabonnement réussi.");
+            }
+        });
+    } else {
+        // Pas encore abonné → Afficher le popup
+        showEmailPopup();
+    }
+}
+
+function showEmailPopup() {
+    const popup = document.getElementById('email-popup');
+    if (popup) popup.classList.remove('hidden');
+}
+</script>
 
 <!-- Modal Produit -->
 <div id="product-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm p-4">
@@ -1113,3 +1391,45 @@ document.getElementById('review-form').addEventListener('submit', function(e) {
     }
 </style>
 {% endblock %}
+<script>
+// Affiche le popup email
+function showEmailPopup() {
+    document.getElementById('email-popup').classList.remove('hidden');
+}
+
+// Soumission du formulaire d'email
+document.getElementById('email-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('user-email').value;
+    const entrepriseId = "{{ entreprise.id }}";
+
+    fetch(`/api/abonnement-email/${entrepriseId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Erreur serveur");
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            localStorage.setItem('abonne_email', email);
+            document.getElementById('email-form').classList.add('hidden');
+            document.getElementById('email-success').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('email-popup').classList.add('hidden');
+            }, 2000);
+        }
+    })
+    .catch(err => {
+        console.error("Erreur:", err);
+        alert("Erreur d'envoi d'email.");
+    });
+});
+
+
+</script>

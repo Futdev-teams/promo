@@ -4,6 +4,70 @@
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+
+    <!-- Overlay futuriste -->
+    <div id="mobile-overlay" class="mobile-overlay"></div>
+    
+    <!-- Email Popup -->
+    <div id="email-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Recevez les meilleures promotions</h3>
+            <form id="email-form">
+                <input type="email" id="user-email" placeholder="Votre email" 
+                       class="w-full px-4 py-2 border rounded-lg mb-3" required>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                    Valider
+                </button>
+            </form>
+            <div id="email-success" class="hidden mt-3 text-green-600">
+                Merci ! Un code de vérification a été envoyé à votre email.
+            </div>
+        </div>
+    </div>
+
+{% if messages %}
+<div class="fixed top-4 right-4 z-50 space-y-2">
+    {% for message in messages %}
+    <div class="px-4 py-2 rounded-lg shadow-lg text-white 
+                {% if message.tags == 'success' %}bg-green-500{% endif %}
+                {% if message.tags == 'error' %}bg-red-500{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<script>
+  // Ouvrir le popup quand on clique sur s'abonner
+function showEmailPopup() {
+    document.getElementById('email-popup').classList.remove('hidden');
+}
+
+// Envoyer l'email
+document.getElementById('email-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('user-email').value;
+    
+    fetch('/api/abonnement-email/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({email: email})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById('email-form').classList.add('hidden');
+            document.getElementById('email-success').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('email-popup').classList.add('hidden');
+            }, 2000);
+        }
+    });
+});
+
+</script>
    <!-- Bannière -->
     <div class="relative h-80 w-full overflow-hidden shadow-xl">
         {% if entreprise.banniere %}
@@ -35,7 +99,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span class="text-white/90 text-lg">{{ entreprise.localisation }}</span>
+                                <span class="text-purple/90 text-lg">{{ entreprise.localisation }}</span>
                             </div>
                         </div>
                     </div>
@@ -53,12 +117,31 @@
                             </svg>
                             WhatsApp
                         </a>
-                        <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation|urlencode }}" target="_blank" class="px-5 py-2 bg-blue-500 text-white font-medium rounded-full flex items-center hover:bg-blue-600 transition-all">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation_map|urlencode }}" target="_blank" class="px-5 py-2 bg-blue-500 text-white font-medium rounded-full flex items-center hover:bg-blue-600 transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
                             Itinéraire
                         </a>
+                        <!-- Bouton Ajouter à l'écran d'accueil -->
+                        <button onclick="addToHomeScreen('{{ entreprise.nom }}', '{{ entreprise.get_absolute_url }}', '{{ entreprise.logo.url }}')" 
+                                class="px-5 py-2 bg-indigo-600 text-white font-medium rounded-full flex items-center hover:bg-indigo-700 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            Ajouter à l'accueil
+                        </button>
+                        
+                        <!-- Bouton S'abonner -->
+                        <!-- Bouton S'abonner -->
+                        <button onclick="toggleSubscription('{{ entreprise.id }}')" 
+                                id="subscribe-btn"
+                                class="px-5 py-2 {% if user_has_subscribed %}bg-green-600 hover:bg-green-700{% else %}bg-gray-600 hover:bg-gray-700{% endif %} text-white font-medium rounded-full flex items-center transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            {% if user_has_subscribed %}Abonné{% else %}S'abonner{% endif %} ({{ entreprise.abonnes_count }})
+                        </button>
                     </div>
                 </div>
             </div>
@@ -139,9 +222,9 @@
                                 <div>
                                     <h3 class="font-semibold text-gray-900 dark:text-white">Localisation</h3>
                                     <p class="text-gray-600 dark:text-gray-400 mt-1">
-                                        {{ entreprise.localisation}}
+                                        {{ entreprise.localisation_map}}
                                     </p>
-                                    <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation|urlencode }}" target="_blank" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-1 inline-flex items-center">
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ entreprise.localisation_map|urlencode }}" target="_blank" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-1 inline-flex items-center">
                                         Voir sur Maps
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -203,6 +286,8 @@
                     </div>
                     <div class="h-64 md:h-full bg-gray-200 dark:bg-gray-700 relative">
                         <!-- Intégration de Google Maps avec options d'ouverture -->
+                         <!-- Intégration de Google Maps avec localisation_map -->
+                    <!-- Intégration de Google Maps avec options d'ouverture -->
                         <iframe 
                             width="100%" 
                             height="100%" 
@@ -210,26 +295,110 @@
                             scrolling="no" 
                             marginheight="0" 
                             marginwidth="0" 
-                            src="https://maps.google.com/maps?q={{ entreprise.localisation|urlencode }}&z=15&output=embed"
+                            src="https://maps.google.com/maps?q={{ entreprise.localisation_map|urlencode }}&z=15&output=embed"
                             class="absolute inset-0"
                             allowfullscreen>
                         </iframe>
-                        <div class="absolute bottom-4 left-4 right-4 flex gap-2">
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ entreprise.localisation|urlencode }}" 
+                        <div class="absolute bottom-10 left-4 right-4 flex gap-2">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ entreprise.localisation_map|urlencode }}" 
                                target="_blank"
                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg transition-colors text-sm">
                                 Itinéraire
                             </a>
-                            <a href="geo:0,0?q={{ entreprise.localisation|urlencode }}"
+                            <a href="geo:0,0?q={{ entreprise.localisation_map|urlencode }}"
                                class="flex-1 bg-gray-800 hover:bg-gray-900 text-white text-center py-2 px-4 rounded-lg transition-colors text-sm">
                                 Ouvrir dans Maps
                             </a>
+    
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+<script>
 
+// Fonction pour ajouter à l'écran d'accueil
+function addToHomeScreen(entrepriseNom, url, logoUrl) {
+    if ('serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window) {
+        // Implémentation PWA pour installation
+        // Vous pouvez stocker ces infos dans localStorage pour un accès rapide
+        localStorage.setItem(`home_${entrepriseNom}`, JSON.stringify({
+            url: url,
+            logo: logoUrl,
+            name: entrepriseNom
+        }));
+        
+        // Afficher une notification de succès
+        alert(`${entrepriseNom} a été ajouté à votre écran d'accueil !`);
+    } else {
+        // Solution de repli pour les navigateurs non PWA
+        if (confirm(`Voulez-vous ajouter un raccourci vers ${entrepriseNom} sur votre écran d'accueil ?`)) {
+            // Créer un favori avec un icône
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('data-pinned-tab-title', entrepriseNom);
+            link.setAttribute('data-pinned-tab-icon', logoUrl);
+            document.body.appendChild(link);
+            alert(`Ouvrez ce lien dans Safari (iOS) ou Chrome (Android) et utilisez l'option "Ajouter à l'écran d'accueil"`);
+        }
+    }
+}
+
+// Fonction pour gérer les abonnements
+function toggleSubscription(entrepriseId) {
+    const btn = document.getElementById('subscribe-btn');
+    const isSubscribed = btn.classList.contains('bg-green-600');
+    
+    // Envoyer une requête AJAX au serveur
+    fetch(`/api/abonnement-email/${entrepriseId}/`, {
+        method: isSubscribed ? 'DELETE' : 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mettre à jour l'interface
+            if (isSubscribed) {
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                btn.innerHTML = `<svg...>S'abonner</svg> (${data.abonnes_count})`;
+            } else {
+                btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.innerHTML = `<svg...>Abonné</svg> (${data.abonnes_count})`;
+            }
+            
+            // Notification
+            alert(`Vous êtes ${isSubscribed ? 'désabonné' : 'abonné'} avec succès !`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue');
+    });
+}
+
+// Fonction pour partager l'entreprise
+function shareEnterprise() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Découvrez {{ entreprise.nom }} sur Promo-Plus',
+            text: 'Retrouvez toutes les promotions de {{ entreprise.nom }} sur Promo-Plus',
+            url: window.location.href
+        })
+        .catch(err => console.log('Erreur de partage:', err));
+    } else {
+        // Solution de repli
+        const shareUrl = `whatsapp://send?text=Découvrez ${encodeURIComponent(entreprise.nom)} sur Promo-Plus: ${window.location.href}`;
+        window.open(shareUrl, '_blank');
+    }
+}
+
+</script>
         <!-- Promotions avec filtres -->
         <div class="mb-12">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -327,17 +496,17 @@
                             
                             <div class="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
                                 <button onclick="openProductModal({
-                                    'nom': '{{ produit.nom }}',
-                                    'entreprise_nom': '{{ entreprise.nom }}',
-                                    'contact': '{{ entreprise.contact }}',
-                                    'image_url': '{{ produit.image.url }}',
+                                    'nom': '{{ produit.nom|escapejs }}',
+                                    'entreprise_nom': '{{ produit.entreprise.nom|escapejs }}',
+                                    'contact': '{{ produit.entreprise.contact|escapejs }}',
+                                    'image_url': '{{ produit.image.url|escapejs }}',
                                     'prix': '{{ produit.prix }}',
                                     'prix_promotionnel': '{{ produit.prix_promotionnel }}',
                                     'discount_percentage': '{{ produit.discount_percentage }}',
-                                    'description': '{{ produit.description|default:"Aucune description disponible" }}',
+                                    'description': '{{ produit.description|default:"Aucune description disponible"|escapejs }}',
                                     'quantite': '{{ produit.quantite }}',
                                     'date_fin_promo': '{{ produit.date_fin_promo|date:"Y-m-d" }}',
-                                    'categorie': '{{ produit.categorie.nom }}'
+                                    'categorie': '{{ produit.categorie.nom|escapejs }}'
                                 })" class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-full text-sm transition-colors">
                                     Voir détails
                                 </button>
@@ -407,23 +576,27 @@
                                 </svg>
                                 Fin: {{ produit.date_fin_promo|date:"d/m/Y" }}
                             </div>
-                            
+
+                            <!-- Ton produit ici -->
                             <div class="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
                                 <button onclick="openProductModal({
-                                    'nom': '{{ produit.nom }}',
-                                    'entreprise_nom': '{{ entreprise.nom }}',
-                                    'contact': '{{ entreprise.contact }}',
-                                    'image_url': '{{ produit.image.url }}',
+                                    'nom': '{{ produit.nom|escapejs }}',
+                                    'entreprise_nom': '{{ produit.entreprise.nom|escapejs }}',
+                                    'contact': '{{ produit.entreprise.contact|escapejs }}',
+                                    'image_url': '{{ produit.image.url|escapejs }}',
                                     'prix': '{{ produit.prix }}',
                                     'prix_promotionnel': '{{ produit.prix_promotionnel }}',
                                     'discount_percentage': '{{ produit.discount_percentage }}',
-                                    'description': '{{ produit.description|default:"Aucune description disponible" }}',
+                                    'description': '{{ produit.description|default:"Aucune description disponible"|escapejs }}',
                                     'quantite': '{{ produit.quantite }}',
                                     'date_fin_promo': '{{ produit.date_fin_promo|date:"Y-m-d" }}',
-                                    'categorie': '{{ produit.categorie.nom }}'
+                                    'categorie': '{{ produit.categorie.nom|escapejs }}'
                                 })" class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-full text-sm transition-colors">
                                     Voir détails
                                 </button>
+                            
+
+
                                 <button onclick="shareOnWhatsApp('{{ produit.nom }}', '{{ produit.prix_promotionnel }}', '{{ produit.date_fin_promo|date:"d/m/Y" }}', '{{ produit.image.url }}')" class="flex items-center px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-full text-sm transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -550,7 +723,7 @@
 
 <!-- Modal Produit -->
 <div id="product-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <button onclick="closeModal('product-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors z-10">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -610,6 +783,43 @@
         </div>
     </div>
 </div>
+<script>
+function openProductModal(data) {
+    const modal = document.getElementById("product-modal");
+    modal.classList.remove("hidden");
+
+    document.getElementById("modal-product-name").innerText = data.nom;
+    document.getElementById("modal-product-entreprise").innerText = data.entreprise_nom;
+    document.getElementById("modal-product-image").src = data.image_url;
+    document.getElementById("modal-product-description").innerText = data.description;
+    document.getElementById("modal-product-old-price").innerText = data.prix + ' FCFA';
+    document.getElementById("modal-product-price").innerText = data.prix_promotionnel + ' FCFA';
+    document.getElementById("modal-product-discount").innerText = '-' + data.discount_percentage + '%';
+    document.getElementById("modal-product-expiry").innerText = data.date_fin_promo;
+
+    // Stock
+    const stockEl = document.getElementById("modal-product-stock");
+    const stockText = document.getElementById("modal-product-stock-text");
+    if (parseInt(data.quantite) > 0) {
+        stockEl.classList.add("bg-green-500");
+        stockEl.classList.remove("bg-red-500");
+        stockText.innerText = "En stock";
+    } else {
+        stockEl.classList.add("bg-red-500");
+        stockEl.classList.remove("bg-green-500");
+        stockText.innerText = "Rupture de stock";
+    }
+
+    // Boutons appel / whatsapp
+    const phone = data.contact;
+    document.getElementById("modal-product-call").href = "tel:" + phone;
+    document.getElementById("modal-product-whatsapp").href = "https://wa.me/" + phone.replace(/\s+/g, '');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.add("hidden");
+}
+</script>
 
 <!-- Modal Contact -->
 <div id="contact-popup" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm p-4">
@@ -666,88 +876,54 @@
         </div>
     </div>
 </div>
-<!-- Formulaire d'avis -->
-    <div id="avis-form" class="hidden mb-6">
-        <form method="POST" class="space-y-4 bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+
+<!-- Modal avis_client -->
+<div id="review-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeModal('review-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Donner votre avis_client</h2>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Partagez votre expérience avec {{ entreprise.nom }}</p>
+        </div>
+        
+        <form id="review-form" method="post" action="{% url 'entreprise_public_view' entreprise.id %}" class="space-y-4">
             {% csrf_token %}
+            <input type="hidden" name="note" id="review-rating" value="0">
+            
             <div>
-                <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Votre nom</label>
-                <input type="text" name="nom" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-purple-500">
+                <label for="id_nom" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Votre nom</label>
+                <input type="text" name="nom" id="id_nom" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700" required>
             </div>
+            
             <div>
-                <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Note (1-5)</label>
-                <select name="note" class="w-full px-3 py-2 border rounded">
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Très bien</option>
-                    <option value="3">3 - Moyen</option>
-                    <option value="2">2 - Passable</option>
-                    <option value="1">1 - Mauvais</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Note</label>
+                <div class="flex justify-center space-x-1" id="rating-stars">
+                    {% for i in "12345"|make_list %}
+                    <button type="button" class="star-rating" data-value="{{ forloop.counter }}">
+                        <svg class="w-8 h-8 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                    </button>
+                    {% endfor %}
+                </div>
             </div>
+            
             <div>
-                <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Commentaire</label>
-                <textarea name="commentaire" rows="3" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-purple-500"></textarea>
+                <label for="id_commentaire" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commentaire</label>
+                <textarea name="commentaire" id="id_commentaire" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700" required></textarea>
             </div>
-            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Envoyer l'avis</button>
+            
+            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">
+                Envoyer l'avis_client
+            </button>
         </form>
     </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-        {% if avis %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% for avis in avis|slice:":4" %}
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3">
-                        <span class="text-gray-700 dark:text-gray-300 font-medium">{{ avis.nom|first|upper }}</span>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-800 dark:text-gray-200">{{ avis.nom }}</h4>
-                        <div class="flex items-center">
-                            {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= avis.note %}
-                                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292z"/>
-                                </svg>
-                                {% else %}
-                                <svg class="w-4 h-4 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292z"/>
-                                </svg>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 text-sm">{{ avis.commentaire }}</p>
-                <p class="text-gray-400 dark:text-gray-500 text-xs mt-2">{{ avis.date_creation|date:"d/m/Y" }}</p>
-            </div>
-            {% endfor %}
-        </div>
-
-        {% if avis|length > 4 %}
-        <div class="text-center mt-6">
-            <a href="#" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 text-sm font-medium inline-flex items-center">
-                Voir tous les avis ({{ avis|length }})
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-            </a>
-        </div>
-        {% endif %}
-
-        {% else %}
-        <div class="text-center py-8">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mt-4">Aucun avis pour le moment</h3>
-            <p class="text-gray-500 dark:text-gray-400 mt-2">Soyez le premier à donner votre avis</p>
-        </div>
-        {% endif %}
-    </div>
 </div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 <script>
     // Fonctions pour les modals
@@ -983,7 +1159,19 @@
         });
     });
 
-
+// Gestion du formulaire d'avis_client
+document.getElementById('review-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const rating = document.getElementById('review-rating').value;
+    if (rating === '0') {
+        alert('Veuillez donner une note');
+        return;
+    }
+    
+    // Soumettre le formulaire normalement
+    this.submit();
+});
     // Gestion du formulaire d'avis_client
     document.getElementById('review-form').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -1083,3 +1271,81 @@
     }
 </style>
 {% endblock %}
+<script>
+// Affiche le popup email
+function showEmailPopup() {
+    document.getElementById('email-popup').classList.remove('hidden');
+}
+
+// Soumission du formulaire d'email
+document.getElementById('email-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('user-email').value;
+    const entrepriseId = "{{ entreprise.id }}";
+
+    fetch(`/api/abonnement-email/${entrepriseId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Erreur serveur");
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            document.getElementById('email-form').classList.add('hidden');
+            document.getElementById('email-success').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('email-popup').classList.add('hidden');
+            }, 2000);
+        }
+    })
+    .catch(err => {
+        console.error("Erreur:", err);
+        alert("Erreur d'envoi d'email.");
+    });
+});
+
+// Gérer abonnement/désabonnement
+function toggleSubscription(entrepriseId) {
+    const btn = document.getElementById('subscribe-btn');
+    const email = prompt("Entrez votre email pour continuer :");
+    if (!email) return;
+    const isSubscribed = btn.classList.contains('bg-green-600');
+
+    fetch(`/api/abonnement-email/${entrepriseId}/`, {
+        method: isSubscribed ? 'DELETE' : 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Erreur serveur");
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            if (isSubscribed) {
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                btn.innerHTML = `S'abonner (${data.abonnes_count})`;
+            } else {
+                btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.innerHTML = `Abonné (${data.abonnes_count})`;
+            }
+            alert(`Vous êtes ${isSubscribed ? 'désabonné' : 'abonné'} avec succès !`);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert("Erreur de communication avec le serveur.");
+    });
+}
+</script>

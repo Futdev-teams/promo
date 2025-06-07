@@ -5,6 +5,19 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 
+from django import forms
+from .models import ImageEntreprise
+
+class ImageEntrepriseForm(forms.ModelForm):
+    class Meta:
+        model = ImageEntreprise
+        fields = ['image', 'description']
+        widgets = {
+            'description': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': "Description de l'image"
+            }),
+        }
 
 
 
@@ -66,26 +79,81 @@ from django.utils import timezone
 from .models import Entreprise, Produit, HoraireOuverture, FAQ
 from datetime import date
 
+from django import forms
+from django.forms import ModelForm
+from .models import Entreprise
+
 class EntrepriseForm(ModelForm):
     class Meta:
         model = Entreprise
-        fields = ['nom', 'email', 'contact', 'logo', 'banniere', 'localisation', 
-                 'latitude', 'longitude', 'facebook', 'instagram', 'twitter', 'website']
+        fields = [
+            'nom', 'email', 'contact', 'logo', 'banniere',
+            'localisation', 'localisation_map',
+            'facebook', 'instagram', 'twitter', 'website',
+            'description', 'meta_description', 'meta_keywords'
+        ]
         widgets = {
-            'localisation': forms.Textarea(attrs={'rows': 3}),
+            'nom': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'Nom de l’entreprise'
+            }),
+            
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'email@entreprise.com'
+            }),
+            'contact': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': '+228 90 00 00 00'
+            }),
+            'logo': forms.ClearableFileInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg'
+            }),
+            'banniere': forms.ClearableFileInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg'
+            }),
+            'localisation': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'rows': 2,
+                'placeholder': 'Adresse textuelle pour affichage'
+            }),
+            'localisation_map': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'rows': 1,
+                'placeholder': 'Coordonnées ou lieu (pour carte Google Maps)'
+            }),
+            'facebook': forms.URLInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'https://facebook.com/entreprise'
+            }),
+            'instagram': forms.URLInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'https://instagram.com/entreprise'
+            }),
+            'twitter': forms.URLInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'https://twitter.com/entreprise'
+            }),
+            'website': forms.URLInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'https://www.entreprise.tg'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'rows': 3,
+                'placeholder': 'Décrivez votre entreprise et ses activités principales...'
+            }),
+            'meta_description': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'rows': 2,
+                'placeholder': 'Courte description pour le SEO (référencement Google)...'
+            }),
+            'meta_keywords': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg',
+                'placeholder': 'mots-clés séparés par des virgules (ex: hôtel, togolaise, promo)'
+            }),
         }
-    
-    def clean_latitude(self):
-        latitude = self.cleaned_data.get('latitude')
-        if latitude < -90 or latitude > 90:
-            raise ValidationError("La latitude doit être entre -90 et 90")
-        return latitude
-    
-    def clean_longitude(self):
-        longitude = self.cleaned_data.get('longitude')
-        if longitude < -180 or longitude > 180:
-            raise ValidationError("La longitude doit être entre -180 et 180")
-        return longitude
+
 
 from django import forms
 from django.core.exceptions import ValidationError
