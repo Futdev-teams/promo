@@ -215,6 +215,8 @@ class AvisClient(models.Model):
     commentaire = models.TextField()
     date_creation = models.DateTimeField(auto_now_add=True)
     approuve = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
     
     class Meta:
         ordering = ['-date_creation']
@@ -266,9 +268,9 @@ from .models import Produit
 @receiver(pre_save, sender=Produit)
 def check_promo_expiration(sender, instance, **kwargs):
     if instance.date_fin_promo and instance.date_fin_promo < timezone.now():
-        instance.ext_expire = True
+        instance.est_expire = True
     else:
-        instance.ext_expire = False
+        instance.est_expire = False
 
 
 class ActivityLog(models.Model):

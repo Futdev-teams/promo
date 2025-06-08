@@ -18,6 +18,15 @@ from django.contrib import admin # type: ignore
 from django.urls import path, include # type: ignore
 from django.conf import settings # type: ignore
 from django.conf.urls.static import static # type: ignore
+from django.contrib.sitemaps.views import sitemap
+from promotions.sitemaps import StaticViewSitemap, EntrepriseSitemap, ProduitSitemap, FAQSitemap
+sitemaps = {
+    'static': StaticViewSitemap(),
+    'entreprises': EntrepriseSitemap(),
+    'produits': ProduitSitemap(),
+    'faq': FAQSitemap(),
+}
+
 
 urlpatterns = [
     # Admin
@@ -25,8 +34,10 @@ urlpatterns = [
 
     # URLs de l'application promotions
     path('', include('promotions.urls')),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
 ]
 
 # Configuration pour servir les fichiers médias en développement
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
