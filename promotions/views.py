@@ -1224,12 +1224,29 @@ def dashboard(request):
 from django.contrib import messages
 from .forms import AvisClientForm  # Vous devrez créer ce formulaire
 
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
 def entreprise_public_view(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     produits = Produit.objects.filter(entreprise=entreprise)
     produits_actifs = produits.filter(date_fin_promo__gte=timezone.now(), est_expire=False)
     produits_expires = produits.filter(est_expire=True)
-    
+
+    # 🔥 Récupérer le produit à partager via ?produit=id
+    produit_id = request.GET.get('produit')
+    produit = None
+    full_image_url = ''
+    if produit_id:
+        try:
+            produit = produits.get(id=produit_id)
+            if produit.image:
+                full_image_url = request.build_absolute_uri(produit.image.url)
+        except Produit.DoesNotExist:
+            produit = None
+
+    full_page_url = request.build_absolute_uri(entreprise.get_absolute_url())
+
     if request.method == 'POST':
         form = AvisClientForm(request.POST)
         if form.is_valid():
@@ -1240,18 +1257,21 @@ def entreprise_public_view(request, entreprise_id):
             return redirect('entreprise_public_view', entreprise_id=entreprise.id)
     else:
         form = AvisClientForm()
-    
+
     context = {
         'entreprise': entreprise,
         'produits': produits,
         'produits_actifs': produits_actifs,
         'produits_expires': produits_expires,
+        'produit': produit,  # Le produit sélectionné
+        'full_image_url': full_image_url,
+        'full_page_url': full_page_url,
         'horaires': entreprise.horaires_ouverture.all().order_by('jour'),
         'avis': entreprise.avis_clients.filter(approuve=True).order_by('-date_creation'),
         'faqs': entreprise.faqs.all().order_by('ordre'),
-        'form': form  # Ajoutez le formulaire au contexte
+        'form': form,
     }
-    
+
     return render(request, 'promotions/entreprise_detail.html', context)
 @login_required 
 def modifier_entreprise(request):

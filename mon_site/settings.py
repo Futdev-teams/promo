@@ -157,18 +157,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_USE_TLS=True
+EMAIL_USE_TLS = True                      # TLS = True, comme avec Gmail
+EMAIL_USE_SSL = False                     # Ne PAS activer SSL en même temps
 
-EMAIL_HOST='smtp.gmail.com'
+EMAIL_HOST = 'mail76.lwspanel.com'      # Serveur SMTP de promo-plus.com
+EMAIL_PORT = 587                          # Port pour TLS
 
-EMAIL_HOST_USER=env("email")
-
-EMAIL_HOST_PASSWORD=env("em_pass")
-
-EMAIL_PORT = 587
+EMAIL_HOST_USER = env("email")           # Ex : info@promo-plus.com
+EMAIL_HOST_PASSWORD = env("em_pass")     # Ton mot de passe promo-plus
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 
 
 # Configuration DRF
@@ -178,4 +176,4 @@ REST_FRAMEWORK = {
     ]
 }
 
-CONTACT_EMAIL='elmaniora1234@gmail.com'
+CONTACT_EMAIL=EMAIL_HOST_USER

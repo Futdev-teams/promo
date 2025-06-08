@@ -1,0 +1,21 @@
+{
+    "name": "PromoPlus",
+    "short_name": "Promo",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4f46e5",
+    "icons": [
+      {
+        "src": "/static/favicon.ico",
+        "sizes": "192x192",
+        "type": "icone/ico"
+      },
+      {
+        "src": "/static/favicon.ico",
+        "sizes": "512x512",
+        "type": "icone/ico"
+      }
+    ]
+  }
+  
