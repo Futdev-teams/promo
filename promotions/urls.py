@@ -2,11 +2,21 @@ from django.urls import path # type: ignore
 from . import views
 from . import api_views 
 from django.http import HttpResponse
+from django.contrib.sitemaps.views import sitemap
+from promotions.sitemaps import StaticViewSitemap, EntrepriseSitemap, ProduitSitemap, FAQSitemap
+from django.views.generic import TemplateView
 
+sitemaps = {
+    'static': StaticViewSitemap(),
+    'entreprises': EntrepriseSitemap(),
+    'produits': ProduitSitemap(),
+    'faq': FAQSitemap(),
+}
 urlpatterns = [
     # Page d'accueil
     path('', views.accueil, name='accueil'),
-
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
     #page de la liste des entrerprise :
     path('entreprise', views.entreprise ,name='entreprise'),
 

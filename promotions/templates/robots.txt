@@ -1,3 +1,7 @@
 User-agent: *
 Disallow: /admin/
-Sitemap: https://www.promo-plus.com/sitemap.xml
+Disallow: /connexion/
+Disallow: /signup/
+allow: /
+
+Sitemap: https://promo-plus.com/sitemap.xml
